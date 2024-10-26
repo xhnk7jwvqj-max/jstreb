@@ -95,7 +95,7 @@ async function waitForAnimationFrame() {
 }
 
 async function doAnimate() {
-  if (window.data.timestep == 0) {
+  if (window.data.timestep == 1) {
     return;
   }
   var reset = JSON.stringify(window.data);
@@ -1203,7 +1203,7 @@ async function optimizeRange2() {
   document.getElementById("optimize").innerText = "Stop";
   optimizingRange2 = true;
   //wait();
-  var step = 5;
+  var step = .1;
   var timer = 0;
   function pullconfig() {
 	  var config = []
@@ -1268,7 +1268,7 @@ async function optimizeRange2() {
     var zscore = q(newz)
     timer += 1
     topz.push([zscore, newz])
-    if (zscore > topz[0][0]) {
+    if (timer % 15 == 1 || zscore > topz[0][0]) {
       
       drawMechanism();
       await wait();
@@ -1276,6 +1276,7 @@ async function optimizeRange2() {
     topz = topz.sort((a, b) => b[0] - a[0])
     z = topz[0][1]
   }
+  pushconfig(z);
   drawMechanism();
 }
 let optimizingRange = false;
@@ -1345,7 +1346,7 @@ async function gentlify() {
   document.getElementById("gentlify").innerText = "Stop";
   gentlifying = true;
   //wait();
-  var step = .5;
+  var step = .6;
   var timer = 0;
   function pullconfig() {
 	  var config = []
@@ -1436,7 +1437,7 @@ async function optimize() {
   //wait();
   var optTimeout = 500;
   var timer = optTimeout;
-  var step = 2;
+  var step = 3;
   var oldrange = +document.getElementById("range").innerText;
   var oldload = +document.getElementById("peakLoad").innerText;
   while (optimizing) {
