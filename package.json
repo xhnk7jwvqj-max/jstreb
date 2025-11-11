@@ -9,6 +9,8 @@
     "yarn": "^1.22.19"
   },
   "devDependencies": {
+    "@sparticuz/chromium": "^141.0.0",
+    "puppeteer-core": "^24.29.1",
     "vitest": "^1.1.2"
   }
 }
