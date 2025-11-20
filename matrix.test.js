@@ -3,6 +3,7 @@ import {
   naiveMultiply,
   multiplyTransposeSameSparsity,
   naiveSolve,
+  tobitvec,
 } from "./matrix.js";
 
 test("funky sparse matrix routine", () => {
@@ -16,12 +17,7 @@ test("funky sparse matrix routine", () => {
   ];
 
   // Convert to sparse format: [bitvector, val_at_bit0, val_at_bit1, val_at_bit2, val_at_bit3]
-  var sparseA = [
-    [11, 4, 5, 0, 3],  // bits 0,1,3 set: values [4,5,0,3]
-    [9, 5, 0, 0, 2],   // bits 0,3 set: values [5,0,0,2]
-    [12, 0, 0, 9, 3],  // bits 2,3 set: values [0,0,9,3]
-    [7, 3, 2, 3, 0],   // bits 0,1,2 set: values [3,2,3,0]
-  ];
+  var sparseA = symmetricA.map(row => [tobitvec(row), ...row]);
 
   var out1 = naiveMultiply(symmetricA, symmetricA);
   var out2 = multiplyTransposeSameSparsity(sparseA, sparseA);
