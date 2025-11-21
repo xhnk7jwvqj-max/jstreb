@@ -20,7 +20,6 @@ yarn test
 
 ### E2E Tests
 
-#### Local Testing (Requires Browser Installation)
 ```bash
 # Install Playwright browsers
 npx playwright install chromium
@@ -34,12 +33,3 @@ yarn test:e2e:ui
 # Debug mode
 yarn test:e2e:debug
 ```
-
-#### Local Testing (Using Docker - Recommended)
-No browser installation needed! Run tests in the same Docker container used by CI:
-
-```bash
-./test-e2e-docker.sh
-```
-
-This requires Docker to be installed on your system.
