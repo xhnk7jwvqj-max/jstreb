@@ -52,4 +52,25 @@ test.describe('Trebuchet Designer', () => {
     await expect(page.locator('#peakLoad')).toBeVisible();
     await expect(page.locator('#simtime')).toBeVisible();
   });
+
+  test('should verify range and maximum force ground truth values', async ({ page }) => {
+    await page.goto('/');
+
+    // Wait for the default preset to load and simulation to complete
+    // The application loads the "Hinged Counterweight" preset by default
+    await page.waitForTimeout(1000);
+
+    // Extract the range value
+    const rangeText = await page.locator('#range').textContent();
+    const rangeValue = parseFloat(rangeText);
+
+    // Extract the peak load (maximum force) value
+    const peakLoadText = await page.locator('#peakLoad').textContent();
+    const peakLoadValue = parseFloat(peakLoadText);
+
+    // Verify ground truth values (calculated from the default preset simulation)
+    // Expected values: Range = 331.2 ft, Peak Force = 1020.3 lbf
+    await expect(rangeValue).toBeCloseTo(331.2, 1); // Within 0.1 ft
+    await expect(peakLoadValue).toBeCloseTo(1020.3, 1); // Within 0.1 lbf
+  });
 });
