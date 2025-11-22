@@ -232,6 +232,7 @@ export function rk45(system, y_0, timestep, tfinal) {
     store.clear();
     while (t < times[times.length - 1]) {
       times.pop();
+      forceLog.pop();
       var string = constraintLog.pop();
       system.constraints = JSON.parse(string);
       system.stringConstraint = string;
@@ -395,7 +396,7 @@ function computeEffectRope(result, rope, system) {
       // check for dropping on based on the shape of the rope through the activated pulleys
       var pulley_before = i - 1;
       while (
-        pulley_before > 1 &&
+        pulley_before > 0 &&
         (rope.p2[pulley_before - 1].wrapping == "ccw_drop" ||
           rope.p2[pulley_before - 1].wrapping == "cw_drop")
       ) {
@@ -428,10 +429,14 @@ function computeEffectRope(result, rope, system) {
 
   positions = [];
   positions.push(rope.p1);
+  var index_in_p2 = 0;
+  var indices_in_p2 = [-1];
   for (var pulley of rope.p2) {
     if (!(pulley.wrapping == "ccw_drop") && !(pulley.wrapping == "cw_drop")) {
       positions.push(pulley.idx);
+      indices_in_p2.push(index_in_p2);
     }
+    index_in_p2 += 1;
   }
   positions.push(rope.p3);
   for (var i = 1; i < positions.length - 1; i++) {
@@ -440,10 +445,10 @@ function computeEffectRope(result, rope, system) {
     var p3 = pget(system.positions, positions[i + 1]);
     var wedge_ = wedge(subtract(p1, p2), subtract(p2, p3));
     if (
-      (wedge_ > 0 && rope.p2[i - 1].wrapping == "ccw") ||
-      (wedge_ < 0 && rope.p2[i - 1].wrapping == "cw")
+      (wedge_ > 0 && rope.p2[indices_in_p2[i]].wrapping == "ccw") ||
+      (wedge_ < 0 && rope.p2[indices_in_p2[i]].wrapping == "cw")
     ) {
-      rope.p2.splice(i - 1, 1);
+      rope.p2.splice(indices_in_p2[i], 1);
       system.stringConstraint = null;
       break;
     }
@@ -620,7 +625,7 @@ function computeEffectF2k(result, f2k, system) {
 
   sparsepset(result, [eX, eY], f2k.slide);
   sparsepset(result, [eXref, eYref], f2k.reference);
-  pset(result, [eXbase, eYbase], f2k.base);
+  sparsepset(result, [eXbase, eYbase], f2k.base);
   return result;
 }
 function computeAccelerationF2k(f2k, system) {
