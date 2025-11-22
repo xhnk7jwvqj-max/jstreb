@@ -93,6 +93,21 @@ test("all presets conserve energy", () => {
       expect(energyDifference).toBeLessThanOrEqual(tolerance);
     }
 
+    // Sanity check: verify particles stay within reasonable bounds
+    // This ensures constraints are actually working (not just doing nothing)
+    for (let i = 0; i < trajectories.length; i++) {
+      const state = trajectories[i];
+      for (let p = 0; p < data.particles.length; p++) {
+        const y = state[2 * p + 1];
+        if (y >= 1000) {
+          console.error(`\n!!! CONSTRAINT FAILURE in ${presetName} !!!`);
+          console.error(`Particle ${p} exceeded bounds: y = ${y} at t = ${i * data.timestep}s`);
+          console.error(`This indicates the constraint is not working properly.\n`);
+        }
+        expect(y).toBeLessThan(1000); // Particles shouldn't fall off to infinity
+      }
+    }
+
     results.push({
       name: presetName,
       initialEnergy: initialEnergy,
