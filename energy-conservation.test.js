@@ -37,6 +37,10 @@ function calculateEnergy(state, masses) {
 }
 
 test("all presets conserve energy", () => {
+  console.log("\n=== Energy Conservation Report ===\n");
+
+  const results = [];
+
   // Loop over all presets
   for (const [presetName, presetJson] of Object.entries(presets)) {
     const data = JSON.parse(presetJson);
@@ -67,13 +71,53 @@ test("all presets conserve energy", () => {
     // The initial energy should be conserved throughout
     const initialEnergy = energies[0];
 
+    // Find maximum deviation
+    let maxDeviation = 0;
+    let maxDeviationTime = 0;
+    let maxDeviationPercent = 0;
+
     // Check that energy is conserved (allowing for numerical errors)
     // Use relative tolerance of 1% for energy conservation
     const tolerance = Math.abs(initialEnergy) * 0.01;
 
     for (let i = 0; i < energies.length; i++) {
       const energyDifference = Math.abs(energies[i] - initialEnergy);
+      const percentDiff = (energyDifference / Math.abs(initialEnergy)) * 100;
+
+      if (energyDifference > maxDeviation) {
+        maxDeviation = energyDifference;
+        maxDeviationTime = i * data.timestep;
+        maxDeviationPercent = percentDiff;
+      }
+
       expect(energyDifference).toBeLessThanOrEqual(tolerance);
     }
+
+    results.push({
+      name: presetName,
+      initialEnergy: initialEnergy,
+      maxDeviation: maxDeviation,
+      maxDeviationPercent: maxDeviationPercent,
+      maxDeviationTime: maxDeviationTime,
+      duration: data.duration,
+      timesteps: trajectories.length
+    });
+
+    console.log(`${presetName}:`);
+    console.log(`  Initial Energy: ${initialEnergy.toFixed(6)}`);
+    console.log(`  Max Deviation:  ${maxDeviation.toFixed(6)} (${maxDeviationPercent.toFixed(4)}%)`);
+    console.log(`  Occurred at:    t = ${maxDeviationTime.toFixed(2)}s`);
+    console.log(`  Timesteps:      ${trajectories.length}`);
+    console.log();
   }
+
+  console.log("=== Summary ===");
+  console.log(`Total presets tested: ${results.length}`);
+
+  const sorted = results.sort((a, b) => b.maxDeviationPercent - a.maxDeviationPercent);
+  console.log("\nWorst to Best Energy Conservation:");
+  for (const result of sorted) {
+    console.log(`  ${result.name.padEnd(30)} ${result.maxDeviationPercent.toFixed(4)}%`);
+  }
+  console.log();
 });
