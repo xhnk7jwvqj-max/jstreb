@@ -78,11 +78,12 @@ function Slider(p, n, oneway) {
   this.name = "Slider";
 }
 
-function RopeDrum(p1, p2, p3, length) {
+function RopeDrum(p1, p2, p3, radius, totalLength) {
   this.p1 = p1; // free end of rope
   this.p2 = p2; // center of drum
   this.p3 = p3; // point on circumference of drum
-  this.length = length; // total "detour" length
+  this.radius = radius; // drum radius
+  this.totalLength = totalLength; // total rope length (tangent + arc)
   this.name = "RopeDrum";
 }
 
@@ -153,7 +154,8 @@ export function convertBack(sysConstraints) {
           p1: constraint.p1,
           p2: constraint.p2,
           p3: constraint.p3,
-          length: constraint.length,
+          radius: constraint.radius,
+          totalLength: constraint.totalLength,
         });
         break;
     }
@@ -206,7 +208,7 @@ export function simulate(
     sysConstraints.push(new Rope(rope.p1, rope.pulleys.slice(), rope.p3));
   }
   for (var ropedrum of constraints.ropedrum) {
-    sysConstraints.push(new RopeDrum(ropedrum.p1, ropedrum.p2, ropedrum.p3, ropedrum.length));
+    sysConstraints.push(new RopeDrum(ropedrum.p1, ropedrum.p2, ropedrum.p3, ropedrum.radius, ropedrum.totalLength));
   }
 
   var system = new System(
@@ -529,42 +531,67 @@ function computeAccelerationSlider(slider, system) {
 }
 
 function computeEffectRopeDrum(result, ropedrum, system) {
-  // Constraint: |p1 - p2| + |p2 - p3| - |p1 - p3| - L = 0
-  // This models a rope from p1 wrapping around a drum (center p2, point p3 on circumference)
+  // Constraint: sqrt(|p1-p2|^2 - r^2) + r*arcAngle(tangent, p3) = totalLength
+  // This properly models a rope wrapping tangentially around a drum
 
   let pos1 = pget(system.positions, ropedrum.p1);
   let pos2 = pget(system.positions, ropedrum.p2);
   let pos3 = pget(system.positions, ropedrum.p3);
+  let r = ropedrum.radius;
 
-  // Direction vectors
-  let dir12 = subtract(pos1, pos2); // p1 - p2
-  let dir23 = subtract(pos2, pos3); // p2 - p3
-  let dir13 = subtract(pos1, pos3); // p1 - p3
+  // Vector from drum center to rope end
+  let v12 = subtract(pos1, pos2);
+  let d = Math.sqrt(v12[0] * v12[0] + v12[1] * v12[1]);
 
-  // Normalize
-  let norm12 = normalize(dir12);
-  let norm23 = normalize(dir23);
-  let norm13 = normalize(dir13);
+  // Tangent length from p1 to drum surface
+  let d2 = d * d;
+  let r2 = r * r;
+  let tangentLength = Math.sqrt(d2 - r2);
 
-  // ∂C/∂p1 = (p1 - p2)/|p1 - p2| - (p1 - p3)/|p1 - p3|
-  let grad1 = subtract(norm12, norm13);
+  // Angle from p2 to p1
+  let alpha = Math.atan2(v12[1], v12[0]);
 
-  // ∂C/∂p2 = -(p1 - p2)/|p1 - p2| + (p2 - p3)/|p2 - p3|
-  let grad2 = subtract(norm23, norm12);
+  // Angle offset to tangent point (assuming CCW wrap)
+  let beta = Math.asin(r / d);
 
-  // ∂C/∂p3 = -(p2 - p3)/|p2 - p3| + (p1 - p3)/|p1 - p3|
-  let grad3 = subtract(norm13, norm23);
+  // Tangent point angle
+  let theta_T = alpha + Math.PI / 2 - beta;
 
-  sparsepset(result, grad1, ropedrum.p1);
-  sparsepset(result, grad2, ropedrum.p2);
-  sparsepset(result, grad3, ropedrum.p3);
+  // Angle to p3
+  let v23 = subtract(pos3, pos2);
+  let theta_p3 = Math.atan2(v23[1], v23[0]);
+
+  // Arc angle (wrapped to handle discontinuity)
+  let arc_angle = theta_p3 - theta_T;
+  // Normalize to [-π, π]
+  while (arc_angle > Math.PI) arc_angle -= 2 * Math.PI;
+  while (arc_angle < -Math.PI) arc_angle += 2 * Math.PI;
+
+  // Constraint function: C = tangentLength + r * arc_angle - totalLength
+
+  // Compute gradients
+  // ∂C/∂p1
+  let dC_dp1_x = v12[0] / tangentLength + r * (Math.sin(alpha) / d);
+  let dC_dp1_y = v12[1] / tangentLength - r * (Math.cos(alpha) / d);
+
+  // ∂C/∂p2
+  let dC_dp2_x = -v12[0] / tangentLength - r * (Math.sin(alpha) / d) - r * (Math.sin(theta_p3));
+  let dC_dp2_y = -v12[1] / tangentLength + r * (Math.cos(alpha) / d) + r * (Math.cos(theta_p3));
+
+  // ∂C/∂p3
+  let dC_dp3_x = r * Math.sin(theta_p3);
+  let dC_dp3_y = -r * Math.cos(theta_p3);
+
+  sparsepset(result, [dC_dp1_x, dC_dp1_y], ropedrum.p1);
+  sparsepset(result, [dC_dp2_x, dC_dp2_y], ropedrum.p2);
+  sparsepset(result, [dC_dp3_x, dC_dp3_y], ropedrum.p3);
 
   return result;
 }
 
 function computeAccelerationRopeDrum(ropedrum, system) {
-  // Second time derivative of constraint C = |p1 - p2| + |p2 - p3| - |p1 - p3|
-  // Need to compute the centripetal acceleration terms for each segment
+  // Second time derivative of constraint: sqrt(d^2 - r^2) + r*θ = L
+  // where d = |p1-p2| and θ is the arc angle
 
   let pos1 = pget(system.positions, ropedrum.p1);
   let pos2 = pget(system.positions, ropedrum.p2);
@@ -574,29 +601,42 @@ function computeAccelerationRopeDrum(ropedrum, system) {
   let vel2 = pget(system.velocities, ropedrum.p2);
   let vel3 = pget(system.velocities, ropedrum.p3);
 
-  // For segment p1-p2
-  let r12 = subtract(pos1, pos2);
-  let v12 = subtract(vel1, vel2);
-  let l12 = Math.sqrt(r12[0] * r12[0] + r12[1] * r12[1]);
-  let radialVel12 = (r12[0] * v12[0] + r12[1] * v12[1]) / l12;
-  let accel12 = radialVel12 * radialVel12 / l12;
+  let r = ropedrum.radius;
 
-  // For segment p2-p3
-  let r23 = subtract(pos2, pos3);
-  let v23 = subtract(vel2, vel3);
-  let l23 = Math.sqrt(r23[0] * r23[0] + r23[1] * r23[1]);
-  let radialVel23 = (r23[0] * v23[0] + r23[1] * v23[1]) / l23;
-  let accel23 = radialVel23 * radialVel23 / l23;
+  // Distance from p1 to p2
+  let v12 = subtract(pos1, pos2);
+  let d = Math.sqrt(v12[0] * v12[0] + v12[1] * v12[1]);
+  let d2 = d * d;
+  let r2 = r * r;
 
-  // For segment p1-p3
-  let r13 = subtract(pos1, pos3);
-  let v13 = subtract(vel1, vel3);
-  let l13 = Math.sqrt(r13[0] * r13[0] + r13[1] * r13[1]);
-  let radialVel13 = (r13[0] * v13[0] + r13[1] * v13[1]) / l13;
-  let accel13 = radialVel13 * radialVel13 / l13;
+  // Tangent length
+  let tangentLength = Math.sqrt(d2 - r2);
 
-  // Total acceleration = accel12 + accel23 - accel13
-  return accel12 + accel23 - accel13;
+  // Velocity of p1 relative to p2
+  let vRel = subtract(vel1, vel2);
+  let radialVel = (v12[0] * vRel[0] + v12[1] * vRel[1]) / d;
+
+  // Acceleration contribution from tangent length change
+  // d/dt(sqrt(d^2 - r^2)) = d/sqrt(d^2 - r^2) * dd/dt
+  // d^2/dt^2(sqrt(d^2 - r^2)) ≈ (dd/dt)^2 * r^2 / (d^2 - r^2)^(3/2) + centripetal term
+  let tangentAccel = radialVel * radialVel * d * r2 / (tangentLength * tangentLength * tangentLength);
+
+  // Acceleration contribution from arc angle change
+  // The angular velocity of p3 around p2
+  let v23 = subtract(pos3, pos2);
+  let vel_rel_p3 = subtract(vel3, vel2);
+
+  // Angular velocity: ω = (r × v) / r^2 = (x*vy - y*vx) / r^2
+  let omega = (v23[0] * vel_rel_p3[1] - v23[1] * vel_rel_p3[0]) / r2;
+
+  // For the tangent point angle contribution
+  let alpha = Math.atan2(v12[1], v12[0]);
+  let d_alpha_dt = (v12[0] * vRel[1] - v12[1] * vRel[0]) / d2;
+
+  // Angular acceleration contribution
+  let angularAccel = r * (omega * omega + d_alpha_dt * d_alpha_dt);
+
+  return tangentAccel + angularAccel;
 }
 
 function computeEffectColinear(result, colinear, system) {
