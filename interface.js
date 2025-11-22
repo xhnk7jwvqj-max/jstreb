@@ -5,6 +5,7 @@ import {
   calculateRange,
   presets,
 } from "./trebuchetsimulation.js";
+import { sampleGaussian, calculateMean, calculateCovariance, randn, choleskyDecomposition} from "./gaussian.js";
 
 var ctypes = ["rod", "pin", "slider", "colinear", "f2k", "rope"];
 // Prevent scrolling when touching the canvas
@@ -68,8 +69,8 @@ window.data = {
 async function doit() {
   for (var x = 0; x < 600; x += 5) {
     for (var y = 300; y < 900; y += 5) {
-      window.data.particles[5].x = x;
-      window.data.particles[5].y = y;
+      window.data.particles[2].x = x;
+      window.data.particles[2].y = y;
 
       var [_, range, __, ___] = simulateAndRange();
 
@@ -100,7 +101,7 @@ async function waitForAnimationFrame() {
 }
 
 async function doAnimate() {
-  if (window.data.timestep == 0) {
+  if (window.data.timestep == 1) {
     return;
   }
   var reset = JSON.stringify(window.data);
@@ -156,7 +157,7 @@ function terminate(state) {
   var vx = state[2 * window.data.projectile + 2 * window.data.particles.length];
   var vy =
     state[2 * window.data.projectile + 2 * window.data.particles.length + 1];
-  return vx > 40 && vy > 0;
+  return vx > 100 && vy > 0;
 }
 function simulateAndRange() {
   var start = Date.now();
@@ -168,7 +169,7 @@ function simulateAndRange() {
     terminate,
   );
   window.constraintLog = constraintLog;
-  console.log(forceLog)
+  window.forceLog = forceLog
   //var peakLoad = Math.max(
   //  ...constraintLog[1]
   //    .map(JSON.parse)
@@ -594,6 +595,11 @@ function updateUI() {
 function loadPreset(element) {
   window.data = JSON.parse(presets[element.value]);
   fillEmptyConstraints(window.data);
+  normalizeSize()
+}
+
+window.normalizeSize = normalizeSize;
+function normalizeSize() {
   var [trajectories, _, _, _] = simulateAndRange();
   var minx = 999,
     miny = 999,
@@ -1073,6 +1079,92 @@ window.onload = () => {
   //optimize();
   //	setTimeout(optimize, 1000);
 };
+let optimizingRange2 = false;
+async function optimizeRange2() {
+  if (optimizingRange2) {
+    optimizingRange2 = false;
+    document.getElementById("optimize").innerText = "Optimize";
+    return;
+  }
+  document.getElementById("optimize").innerText = "Stop";
+  optimizingRange2 = true;
+  //wait();
+  var step = .1;
+  var timer = 0;
+  function pullconfig() {
+	  var config = []
+    for (var p of window.data.particles.slice(1)) {
+        if (p.x % 10 != 0) {
+          config.push(p.x)
+        }
+        if (p.y % 10 != 0) {
+	  config.push(p.y)
+        }
+          if (p.mass % 1 != 0) {
+		  config.push(p.mass)
+          }
+    }
+    return config
+  }
+  function pushconfig(config) {
+	  var i = 0;
+    for (var p of window.data.particles.slice(1)) {
+        if (p.x % 10 != 0) {
+	  p.x = config[i]
+	  i += 1;
+        }
+        if (p.y % 10 != 0) {
+		p.y = config[i]
+		i += 1
+        }
+
+          if (p.mass % 1 != 0) {
+		  p.mass = Math.abs(config[i])
+		  i += 1
+          }
+    }
+    return config
+  }
+  var z = pullconfig()
+  function q(config) {
+	  pushconfig(config)
+          var [_, range, _, _oad] = simulateAndRange();
+	  return range
+  }
+  var topz = []
+  var newz;
+
+  var population_size = 25 * z.length
+  while (optimizingRange2) {
+
+
+    if (timer > population_size) {
+      topz = topz.slice(0, population_size)
+      var population = topz.map((pair) => pair[1])
+
+      var mean = calculateMean(population)
+      var covariance = calculateCovariance(population, mean)
+      //console.log(covariance)
+      var L = choleskyDecomposition(covariance)
+      newz = sampleGaussian(z, L)
+      //optimizingRange2 = false
+    } else {
+      newz = z.map((el) => el + randn() * step)
+    }
+    var zscore = q(newz)
+    timer += 1
+    topz.push([zscore, newz])
+    if (timer % 15 == 1 || zscore > topz[0][0]) {
+
+      drawMechanism();
+      await wait();
+    }
+    topz = topz.sort((a, b) => b[0] - a[0])
+    z = topz[0][1]
+  }
+  pushconfig(z);
+  drawMechanism();
+}
 let optimizingRange = false;
 async function optimizeRange() {
   if (optimizingRange) {
@@ -1085,20 +1177,20 @@ async function optimizeRange() {
   //wait();
   var optTimeout = 500;
   var timer = optTimeout;
-  var step = 40;
+  var step = 9;
   var oldrange = +document.getElementById("range").innerText;
   while (optimizingRange) {
     var oldDesign = JSON.stringify(window.data);
     for (var p of window.data.particles) {
       if (Math.random() > 0.5) {
-        if (p.x % 100 != 0) {
+        if (p.x % 10 != 0) {
           p.x = p.x + step * (0.5 - Math.random());
         }
-        if (p.y % 100 != 0) {
+        if (p.y % 10 != 0) {
           p.y = p.y + step * (0.5 - Math.random());
         } else {
           if (p.mass % 1 != 0) {
-            p.mass = Math.abs(p.mass + 0.001 * step * (0.5 - Math.random()));
+            p.mass = Math.abs(p.mass + p.mass * 0.01 * step * (0.5 - Math.random()));
           }
         }
       }
@@ -1130,6 +1222,95 @@ async function optimizeRange() {
   }
   drawMechanism();
 }
+var gentlifying = false;
+async function gentlify() {
+  if (gentlifying) {
+    gentlifying = false;
+    document.getElementById("gentlify").innerText = "Gentlify";
+    return;
+  }
+  document.getElementById("gentlify").innerText = "Stop";
+  gentlifying = true;
+  //wait();
+  var step = .6;
+  var timer = 0;
+  function pullconfig() {
+	  var config = []
+    for (var p of window.data.particles.slice(1)) {
+        if (p.x % 10 != 0) {
+          config.push(p.x)
+        }
+        if (p.y % 10 != 0) {
+	  config.push(p.y)
+        }
+          if (p.mass % 1 != 0) {
+		  config.push(p.mass)
+          }
+    }
+    return config
+  }
+  function pushconfig(config) {
+	  var i = 0;
+    for (var p of window.data.particles.slice(1)) {
+        if (p.x % 10 != 0) {
+	  p.x = config[i]
+	  i += 1;
+        }
+        if (p.y % 10 != 0) {
+		p.y = config[i]
+		i += 1
+        }
+
+          if (p.mass % 1 != 0) {
+		  p.mass = Math.abs(config[i])
+		  i += 1
+          }
+    }
+    return config
+  }
+  var z = pullconfig()
+  function q(config) {
+	  pushconfig(config)
+          var [_, range, _, load] = simulateAndRange();
+    if ( range < oldrange) {
+      return -9999999999999999.
+    }
+	  return -load
+  }
+  var topz = []
+  var newz;
+
+  var population_size = 25 * z.length
+  var oldrange = +document.getElementById("range").innerText;
+  while (gentlifying) {
+
+
+    if (timer > population_size) {
+      topz = topz.slice(0, population_size)
+      var population = topz.map((pair) => pair[1])
+
+      var mean = calculateMean(population)
+      var covariance = calculateCovariance(population, mean)
+      //console.log(covariance)
+      var L = choleskyDecomposition(covariance)
+      newz = sampleGaussian(z, L)
+      //optimizingRange2 = false
+    } else {
+      newz = z.map((el) => el + randn() * step)
+    }
+    var zscore = q(newz)
+    timer += 1
+    topz.push([zscore, newz])
+    if (zscore > topz[0][0]) {
+      
+      drawMechanism();
+      await wait();
+    }
+    topz = topz.sort((a, b) => b[0] - a[0])
+    z = topz[0][1]
+  }
+  drawMechanism();
+}
 let optimizing = false;
 async function optimize() {
   if (optimizing) {
@@ -1142,17 +1323,17 @@ async function optimize() {
   //wait();
   var optTimeout = 500;
   var timer = optTimeout;
-  var step = 40;
+  var step = 3;
   var oldrange = +document.getElementById("range").innerText;
   var oldload = +document.getElementById("peakLoad").innerText;
   while (optimizing) {
     var oldDesign = JSON.stringify(window.data);
     for (var p of window.data.particles) {
       if (Math.random() > 0.5) {
-        if (p.x % 100 != 0) {
+        if (p.x % 10 != 0) {
           p.x = p.x + step * (0.5 - Math.random());
         }
-        if (p.y % 100 != 0) {
+        if (p.y % 10 != 0) {
           p.y = p.y + step * (0.5 - Math.random());
         } else {
           p.mass = Math.abs(p.mass + 0.001 * step * (0.5 - Math.random()));
@@ -1256,8 +1437,8 @@ window.createConstraintControlBox = createConstraintControlBox;
 window.getParticleAtPosition = getParticleAtPosition;
 window.saveMechanism = saveMechanism;
 window.loadMechanism = loadMechanism;
-window.optimize = optimize;
-window.optimizeRange = optimizeRange;
+window.optimize = gentlify;
+window.optimizeRange = optimizeRange2;
 window.save = save;
 window.load = load;
 window.updatePulley = updatePulley;
