@@ -591,7 +591,7 @@ function computeEffectRopeDrum(result, ropedrum, system) {
 
 function computeAccelerationRopeDrum(ropedrum, system) {
   // Second time derivative of constraint: sqrt(d^2 - r^2) + r*θ = L
-  // where d = |p1-p2| and θ is the arc angle
+  // Corrected using SymPy derivation (see science/rope_drum_complete.py)
 
   let pos1 = pget(system.positions, ropedrum.p1);
   let pos2 = pget(system.positions, ropedrum.p2);
@@ -603,38 +603,37 @@ function computeAccelerationRopeDrum(ropedrum, system) {
 
   let r = ropedrum.radius;
 
-  // Distance from p1 to p2
-  let v12 = subtract(pos1, pos2);
-  let d = Math.sqrt(v12[0] * v12[0] + v12[1] * v12[1]);
-  let d2 = d * d;
+  // Relative positions and velocities
+  let dx = pos1[0] - pos2[0];
+  let dy = pos1[1] - pos2[1];
+  let vx = vel1[0] - vel2[0];
+  let vy = vel1[1] - vel2[1];
+
+  let dx3 = pos3[0] - pos2[0];
+  let dy3 = pos3[1] - pos2[1];
+  let vx3 = vel3[0] - vel2[0];
+  let vy3 = vel3[1] - vel2[1];
+
+  // Distances
+  let d2 = dx * dx + dy * dy;
+  let d = Math.sqrt(d2);
   let r2 = r * r;
-
-  // Tangent length
   let tangentLength = Math.sqrt(d2 - r2);
+  let tangentLength3 = tangentLength * tangentLength * tangentLength;
 
-  // Velocity of p1 relative to p2
-  let vRel = subtract(vel1, vel2);
-  let radialVel = (v12[0] * vRel[0] + v12[1] * vRel[1]) / d;
+  // PART 1: Tangent length acceleration (CORRECTED from SymPy derivation)
+  // d²L_tangent/dt² = [(dy*vx - dx*vy)² - r²*(vx² + vy²)] / tangent_length³
+  let wedge = dy * vx - dx * vy;  // Cross product
+  let v2 = vx * vx + vy * vy;
+  let tangentAccel = (wedge * wedge - r2 * v2) / tangentLength3;
 
-  // Acceleration contribution from tangent length change
-  // d/dt(sqrt(d^2 - r^2)) = d/sqrt(d^2 - r^2) * dd/dt
-  // d^2/dt^2(sqrt(d^2 - r^2)) ≈ (dd/dt)^2 * r^2 / (d^2 - r^2)^(3/2) + centripetal term
-  let tangentAccel = radialVel * radialVel * d * r2 / (tangentLength * tangentLength * tangentLength);
-
-  // Acceleration contribution from arc angle change
-  // The angular velocity of p3 around p2
-  let v23 = subtract(pos3, pos2);
-  let vel_rel_p3 = subtract(vel3, vel2);
-
-  // Angular velocity: ω = (r × v) / r^2 = (x*vy - y*vx) / r^2
-  let omega = (v23[0] * vel_rel_p3[1] - v23[1] * vel_rel_p3[0]) / r2;
-
-  // For the tangent point angle contribution
-  let alpha = Math.atan2(v12[1], v12[0]);
-  let d_alpha_dt = (v12[0] * vRel[1] - v12[1] * vRel[0]) / d2;
-
-  // Angular acceleration contribution
-  let angularAccel = r * (omega * omega + d_alpha_dt * d_alpha_dt);
+  // PART 2: Angular acceleration (original formulation)
+  let omega_p3 = (dx3 * vy3 - dy3 * vx3) / r2;
+  let omega_alpha = (dx * vy - dy * vx) / d2;
+  let radialVel = dx * vx + dy * vy;
+  let d_beta_dt = -r * radialVel / (d2 * tangentLength);
+  let omega_arc = omega_p3 - omega_alpha + d_beta_dt;
+  let angularAccel = r * omega_arc * omega_arc;
 
   return tangentAccel + angularAccel;
 }
