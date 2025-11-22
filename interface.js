@@ -1,4 +1,9 @@
 import { simulate, convertBack } from "./simulate.js";
+import {
+  fillEmptyConstraints,
+  calculatePeakLoad,
+  calculateRange,
+} from "./trebuchetsimulation.js";
 
 var ctypes = ["rod", "pin", "slider", "colinear", "f2k", "rope"];
 // Prevent scrolling when touching the canvas
@@ -169,55 +174,8 @@ function simulateAndRange() {
   //    .map((y) => Math.max(...y.map((x) => Math.abs(x.force))))
   //    .slice(1),
   //);
-  var peakLoad = Math.max(
-	  ...forceLog.slice(1).map((x) => Math.max(...x.map((y) => Math.abs(y)))));
-
-  var axlecoord = -window.data.particles[window.data.mainaxle].y;
-  var mincoord = -window.data.particles[window.data.mainaxle].y;
-  var range = 0;
-  for (var trajectory of trajectories) {
-    for (
-      var partIndex = 0;
-      partIndex < window.data.particles.length;
-      partIndex++
-    ) {
-      if (trajectory[2 * partIndex] < 2000) {
-        mincoord = Math.min(mincoord, -trajectory[2 * partIndex + 1]);
-      }
-      axlecoord = Math.max(
-        axlecoord,
-        -trajectory[2 * window.data.mainaxle + 1],
-      );
-    }
-
-    range = Math.max(
-      range,
-      2 *
-        Math.max(
-          0,
-          -trajectory[
-            2 * window.data.particles.length + 2 * window.data.projectile + 1
-          ],
-        ) *
-        trajectory[
-          2 * window.data.particles.length + 2 * window.data.projectile
-        ],
-    );
-  }
-  var height1 = axlecoord - mincoord;
-  var height2 = Math.sqrt(
-    Math.pow(
-      window.data.particles[window.data.armtip].x -
-        window.data.particles[window.data.mainaxle].x,
-      2,
-    ) +
-      Math.pow(
-        window.data.particles[window.data.armtip].y -
-          window.data.particles[window.data.projectile].y,
-        2,
-      ),
-  );
-  range = (range / Math.max(height1, 0.75 * height2)) * window.data.axleheight;
+  var peakLoad = calculatePeakLoad(forceLog);
+  var range = calculateRange(trajectories, window.data);
   var end = Date.now();
   document.getElementById("simtime").innerText = end - start;
   return [trajectories, range, constraintLog, peakLoad];
@@ -631,27 +589,6 @@ function updateUI() {
     }
   }
   document.getElementById("axleheight").value = window.data.axleheight;
-}
-function fillEmptyConstraints(data) {
-  for (var ctype of ctypes) {
-    if (data.constraints[ctype] === undefined) {
-      data.constraints[ctype] = [];
-    }
-  }
-  var sliderCounts = data.particles.map(() => 0);
-  data.constraints.slider.forEach((x) => {
-    if (!x.oneway) {
-      sliderCounts[x.p] += 1;
-    }
-  });
-  data.constraints.slider = data.constraints.slider.filter(
-    (x) => sliderCounts[x.p] < 2,
-  );
-  data.constraints.pin = data.constraints.pin.concat(
-    sliderCounts
-      .flatMap((x, i) => [{ count: x, p: i }])
-      .filter((x) => x.count > 1),
-  );
 }
 function loadPreset(element) {
   window.data = JSON.parse(presets[element.value]);
