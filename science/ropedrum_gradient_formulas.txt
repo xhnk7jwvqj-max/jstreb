@@ -1,0 +1,30 @@
+RopeDrum Constraint Gradients (for computeEffectRopeDrum)
+================================================================================
+
+Common terms:
+  dx = x1 - x2
+  dy = y1 - y2
+  dx3 = x3 - x2
+  dy3 = y3 - y2
+  d² = dx² + dy²
+  d = sqrt(d²)
+  d³ = d² * d
+  tangent_length = sqrt(d² - r²)
+  tl_r = tangent_length * r
+
+Gradients:
+--------------------------------------------------------------------------------
+∂C/∂x1 = dx/tangent_length + r*dy/d² - r²*dx/(d³*tangent_length)
+       = dx/tangent_length + r*dy/d² - r²*dx/(d²*d*tangent_length)
+
+∂C/∂y1 = dy/tangent_length - r*dx/d² - r²*dy/(d³*tangent_length)
+       = dy/tangent_length - r*dx/d² - r²*dy/(d²*d*tangent_length)
+
+∂C/∂x2 = -dx/tangent_length + dy3/r + r*dy/d² - r²*dx/(d³*tangent_length)
+
+∂C/∂y2 = -dy/tangent_length - dx3/r - r*dx/d² - r²*dy/(d³*tangent_length)
+
+∂C/∂x3 = -dy3/r
+
+∂C/∂y3 = dx3/r
+

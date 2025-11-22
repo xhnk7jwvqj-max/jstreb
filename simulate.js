@@ -533,54 +533,42 @@ function computeAccelerationSlider(slider, system) {
 function computeEffectRopeDrum(result, ropedrum, system) {
   // Constraint: sqrt(|p1-p2|^2 - r^2) + r*arcAngle(tangent, p3) = totalLength
   // This properly models a rope wrapping tangentially around a drum
+  // Gradients derived symbolically (see science/ropedrum_manual_derivation.py)
 
   let pos1 = pget(system.positions, ropedrum.p1);
   let pos2 = pget(system.positions, ropedrum.p2);
   let pos3 = pget(system.positions, ropedrum.p3);
   let r = ropedrum.radius;
 
-  // Vector from drum center to rope end
-  let v12 = subtract(pos1, pos2);
-  let d = Math.sqrt(v12[0] * v12[0] + v12[1] * v12[1]);
+  // Positions relative to drum center (p2)
+  let dx = pos1[0] - pos2[0];  // x1 - x2
+  let dy = pos1[1] - pos2[1];  // y1 - y2
+  let dx3 = pos3[0] - pos2[0]; // x3 - x2
+  let dy3 = pos3[1] - pos2[1]; // y3 - y2
 
-  // Tangent length from p1 to drum surface
-  let d2 = d * d;
+  // Common terms
+  let d2 = dx * dx + dy * dy;
+  let d = Math.sqrt(d2);
+  let d3 = d2 * d;
   let r2 = r * r;
   let tangentLength = Math.sqrt(d2 - r2);
 
-  // Angle from p2 to p1
-  let alpha = Math.atan2(v12[1], v12[0]);
+  // Gradients from symbolic derivation:
+  // ∂C/∂x1 = dx/tangent_length + r*dy/d² - r²*dx/(d³*tangent_length)
+  // ∂C/∂y1 = dy/tangent_length - r*dx/d² - r²*dy/(d³*tangent_length)
+  // ∂C/∂x2 = -dx/tangent_length + dy3/r + r*dy/d² - r²*dx/(d³*tangent_length)
+  // ∂C/∂y2 = -dy/tangent_length - dx3/r - r*dx/d² - r²*dy/(d³*tangent_length)
+  // ∂C/∂x3 = -dy3/r
+  // ∂C/∂y3 = dx3/r
 
-  // Angle offset to tangent point (assuming CCW wrap)
-  let beta = Math.asin(r / d);
+  let dC_dp1_x = dx / tangentLength + r * dy / d2 - r2 * dx / (d3 * tangentLength);
+  let dC_dp1_y = dy / tangentLength - r * dx / d2 - r2 * dy / (d3 * tangentLength);
 
-  // Tangent point angle
-  let theta_T = alpha + Math.PI / 2 - beta;
+  let dC_dp2_x = -dx / tangentLength + dy3 / r + r * dy / d2 - r2 * dx / (d3 * tangentLength);
+  let dC_dp2_y = -dy / tangentLength - dx3 / r - r * dx / d2 - r2 * dy / (d3 * tangentLength);
 
-  // Angle to p3
-  let v23 = subtract(pos3, pos2);
-  let theta_p3 = Math.atan2(v23[1], v23[0]);
-
-  // Arc angle (wrapped to handle discontinuity)
-  let arc_angle = theta_p3 - theta_T;
-  // Normalize to [-π, π]
-  while (arc_angle > Math.PI) arc_angle -= 2 * Math.PI;
-  while (arc_angle < -Math.PI) arc_angle += 2 * Math.PI;
-
-  // Constraint function: C = tangentLength + r * arc_angle - totalLength
-
-  // Compute gradients
-  // ∂C/∂p1
-  let dC_dp1_x = v12[0] / tangentLength + r * (Math.sin(alpha) / d);
-  let dC_dp1_y = v12[1] / tangentLength - r * (Math.cos(alpha) / d);
-
-  // ∂C/∂p2
-  let dC_dp2_x = -v12[0] / tangentLength - r * (Math.sin(alpha) / d) - r * (Math.sin(theta_p3));
-  let dC_dp2_y = -v12[1] / tangentLength + r * (Math.cos(alpha) / d) + r * (Math.cos(theta_p3));
-
-  // ∂C/∂p3
-  let dC_dp3_x = r * Math.sin(theta_p3);
-  let dC_dp3_y = -r * Math.cos(theta_p3);
+  let dC_dp3_x = -dy3 / r;
+  let dC_dp3_y = dx3 / r;
 
   sparsepset(result, [dC_dp1_x, dC_dp1_y], ropedrum.p1);
   sparsepset(result, [dC_dp2_x, dC_dp2_y], ropedrum.p2);
