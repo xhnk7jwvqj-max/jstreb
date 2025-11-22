@@ -2,7 +2,7 @@
  * Shared trebuchet simulation utilities
  */
 
-const ctypes = ["rod", "pin", "slider", "colinear", "f2k", "rope"];
+const ctypes = ["rod", "pin", "slider", "colinear", "f2k", "rope", "ropedrum"];
 
 /**
  * Fill in missing constraint types and handle pin constraints from sliders
@@ -114,4 +114,6 @@ export const presets = {
     '{"projectile":3,"mainaxle":0,"armtip":1,"axleheight":8,"timestep":0.2,"duration":35,"particles":[{"x":546.3,"y":584.3,"mass":1},{"x":285.6,"y":791.6,"mass":4},{"x":560.6,"y":481.2,"mass":10},{"x":1000.9,"y":742.8,"mass":1},{"x":645.5,"y":541.0,"mass":500},{"x":72.7,"y":730.2,"mass":1}],"constraints":{"rod":[{"p1":0,"p2":1},{"p1":0,"p2":2},{"p1":2,"p2":4},{"p1":1,"p2":2},{"p1":0,"p2":4,"oneway":true}],"slider":[{"p":0,"normal":{"x":0,"y":1}},{"p":0,"normal":{"x":0.6,"y":1}},{"p":3,"normal":{"x":0,"y":1},"oneway":true},{"p":5,"normal":{"x":1,"y":1}},{"p":5,"normal":{"x":0,"y":1}}],"colinear":[],"rope":[{"p1":5,"pulleys":[{"idx":1,"wrapping":"both"}],"p3":3}]}}',
   MURLIN:
     '{"projectile":8,"mainaxle":0,"armtip":1,"axleheight":8,"timestep":0.1,"duration":40,"particles":[{"x":510.98330181224014,"y":585.0346326615387,"mass":1,"hovered":false},{"x":610.8818474508025,"y":509.1784380643879,"mass":1,"hovered":false},{"x":530.7749198606792,"y":582.2639014087384,"mass":1,"hovered":false},{"x":508.2352941176471,"y":627.2941140567556,"mass":1,"hovered":false},{"x":437.64705882352945,"y":593.176466997932,"mass":1,"hovered":false},{"x":477.64705882352945,"y":495.5294081744026,"mass":1,"hovered":false},{"x":648.2352941176471,"y":446.1176434685202,"mass":1,"hovered":false},{"x":648.2352941176471,"y":464.94117288028497,"mass":200,"hovered":false},{"x":462.2625079139531,"y":570.2700562274708,"mass":1,"hovered":false}],"constraints":{"rod":[{"p1":2,"p2":1,"hovered":false},{"p1":2,"p2":0,"hovered":false},{"p1":1,"p2":0,"hovered":false},{"p1":3,"p2":2,"hovered":false},{"p1":3,"p2":0,"hovered":false},{"p1":4,"p2":3,"hovered":false},{"p1":4,"p2":0,"hovered":false},{"p1":5,"p2":4,"hovered":false},{"p1":5,"p2":0,"hovered":false},{"p1":8,"p2":1,"hovered":false},{"p1":8,"p2":0,"hovered":false,"oneway":true}],"slider":[],"colinear":[],"f2k":[],"rope":[{"p1":7,"pulleys":[{"idx":6,"wrapping":"ccw"},{"idx":5,"wrapping":"ccw"},{"idx":4,"wrapping":"ccw"},{"idx":3,"wrapping":"ccw"}],"p3":2,"hovered":false}],"pin":[{"count":2,"p":0},{"count":2,"p":6}]}}',
+  "Drum Counterweight":
+    '{"projectile":3,"mainaxle":0,"armtip":2,"axleheight":8,"timestep":0.2,"duration":35,"particles":[{"x":536,"y":472.7,"mass":1},{"x":578,"y":515,"mass":4},{"x":720,"y":656,"mass":1},{"x":720,"y":676,"mass":1},{"x":436,"y":622,"mass":100}],"constraints":{"rod":[{"p1":0,"p2":1},{"p1":1,"p2":2},{"p1":2,"p2":3}],"slider":[{"p":0,"normal":{"x":0,"y":1}},{"p":0,"normal":{"x":0.6,"y":1}},{"p":3,"normal":{"x":0,"y":1},"oneway":true}],"ropedrum":[{"p1":4,"p2":0,"p3":1,"length":62}]}}',
 };

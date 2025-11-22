@@ -78,6 +78,14 @@ function Slider(p, n, oneway) {
   this.name = "Slider";
 }
 
+function RopeDrum(p1, p2, p3, length) {
+  this.p1 = p1; // free end of rope
+  this.p2 = p2; // center of drum
+  this.p3 = p3; // point on circumference of drum
+  this.length = length; // total "detour" length
+  this.name = "RopeDrum";
+}
+
 function System(constraints, masses, positions, velocities) {
   this.forces = Array(masses.length).fill([0, -1]).flat(); // Assuming a default force
   this.constraints = constraints;
@@ -94,6 +102,7 @@ export function convertBack(sysConstraints) {
     f2k: [],
     rope: [],
     pin: [],
+    ropedrum: [],
   };
 
   for (let constraint of sysConstraints) {
@@ -137,6 +146,14 @@ export function convertBack(sysConstraints) {
             (p) => p.wrapping != "cw_drop" && p.wrapping != "ccw_drop",
           ),
           p3: constraint.p3,
+        });
+        break;
+      case "RopeDrum":
+        constraints.ropedrum.push({
+          p1: constraint.p1,
+          p2: constraint.p2,
+          p3: constraint.p3,
+          length: constraint.length,
         });
         break;
     }
@@ -187,6 +204,9 @@ export function simulate(
   }
   for (var rope of constraints.rope) {
     sysConstraints.push(new Rope(rope.p1, rope.pulleys.slice(), rope.p3));
+  }
+  for (var ropedrum of constraints.ropedrum) {
+    sysConstraints.push(new RopeDrum(ropedrum.p1, ropedrum.p2, ropedrum.p3, ropedrum.length));
   }
 
   var system = new System(
@@ -282,6 +302,9 @@ function dvdt(system) {
     if (constraint.name === "Rope") {
        computeEffectRope(row, constraint, system);
     }
+    if (constraint.name === "RopeDrum") {
+       computeEffectRopeDrum(row, constraint, system);
+    }
   }
   var interactions2 = sparseDotDivide(interactions, system.masses);
   interactions2 = multiplyTransposeSameSparsity(interactions2, interactions);
@@ -307,6 +330,9 @@ function dvdt(system) {
     }
     if (constraint.name === "Rope") {
       desires[constr] = computeAccelerationRope(constraint, system);
+    }
+    if (constraint.name === "RopeDrum") {
+      desires[constr] = computeAccelerationRopeDrum(constraint, system);
     }
   }
   let constraintForces = naiveSolve(interactions2, desires);
@@ -500,6 +526,77 @@ function computeAccelerationRope(rope, system) {
 function computeAccelerationSlider(slider, system) {
   var f = pget(system.forces, slider.p);
   return slider.n[0] * f[0] + slider.n[1] * f[1];
+}
+
+function computeEffectRopeDrum(result, ropedrum, system) {
+  // Constraint: |p1 - p2| + |p2 - p3| - |p1 - p3| - L = 0
+  // This models a rope from p1 wrapping around a drum (center p2, point p3 on circumference)
+
+  let pos1 = pget(system.positions, ropedrum.p1);
+  let pos2 = pget(system.positions, ropedrum.p2);
+  let pos3 = pget(system.positions, ropedrum.p3);
+
+  // Direction vectors
+  let dir12 = subtract(pos1, pos2); // p1 - p2
+  let dir23 = subtract(pos2, pos3); // p2 - p3
+  let dir13 = subtract(pos1, pos3); // p1 - p3
+
+  // Normalize
+  let norm12 = normalize(dir12);
+  let norm23 = normalize(dir23);
+  let norm13 = normalize(dir13);
+
+  // ∂C/∂p1 = (p1 - p2)/|p1 - p2| - (p1 - p3)/|p1 - p3|
+  let grad1 = subtract(norm12, norm13);
+
+  // ∂C/∂p2 = -(p1 - p2)/|p1 - p2| + (p2 - p3)/|p2 - p3|
+  let grad2 = subtract(norm23, norm12);
+
+  // ∂C/∂p3 = -(p2 - p3)/|p2 - p3| + (p1 - p3)/|p1 - p3|
+  let grad3 = subtract(norm13, norm23);
+
+  sparsepset(result, grad1, ropedrum.p1);
+  sparsepset(result, grad2, ropedrum.p2);
+  sparsepset(result, grad3, ropedrum.p3);
+
+  return result;
+}
+
+function computeAccelerationRopeDrum(ropedrum, system) {
+  // Second time derivative of constraint C = |p1 - p2| + |p2 - p3| - |p1 - p3|
+  // Need to compute the centripetal acceleration terms for each segment
+
+  let pos1 = pget(system.positions, ropedrum.p1);
+  let pos2 = pget(system.positions, ropedrum.p2);
+  let pos3 = pget(system.positions, ropedrum.p3);
+
+  let vel1 = pget(system.velocities, ropedrum.p1);
+  let vel2 = pget(system.velocities, ropedrum.p2);
+  let vel3 = pget(system.velocities, ropedrum.p3);
+
+  // For segment p1-p2
+  let r12 = subtract(pos1, pos2);
+  let v12 = subtract(vel1, vel2);
+  let l12 = Math.sqrt(r12[0] * r12[0] + r12[1] * r12[1]);
+  let radialVel12 = (r12[0] * v12[0] + r12[1] * v12[1]) / l12;
+  let accel12 = radialVel12 * radialVel12 / l12;
+
+  // For segment p2-p3
+  let r23 = subtract(pos2, pos3);
+  let v23 = subtract(vel2, vel3);
+  let l23 = Math.sqrt(r23[0] * r23[0] + r23[1] * r23[1]);
+  let radialVel23 = (r23[0] * v23[0] + r23[1] * v23[1]) / l23;
+  let accel23 = radialVel23 * radialVel23 / l23;
+
+  // For segment p1-p3
+  let r13 = subtract(pos1, pos3);
+  let v13 = subtract(vel1, vel3);
+  let l13 = Math.sqrt(r13[0] * r13[0] + r13[1] * r13[1]);
+  let radialVel13 = (r13[0] * v13[0] + r13[1] * v13[1]) / l13;
+  let accel13 = radialVel13 * radialVel13 / l13;
+
+  // Total acceleration = accel12 + accel23 - accel13
+  return accel12 + accel23 - accel13;
 }
 
 function computeEffectColinear(result, colinear, system) {
