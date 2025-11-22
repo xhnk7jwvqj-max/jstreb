@@ -1,0 +1,447 @@
+{
+  "variants": {
+    "NASAW Modified": {
+      "projectile": 3,
+      "mainaxle": 0,
+      "armtip": 1,
+      "axleheight": 8,
+      "timestep": 0.2,
+      "duration": 37,
+      "particles": [
+        {
+          "x": 496.3,
+          "y": 477.6,
+          "mass": 1
+        },
+        {
+          "x": 677.5,
+          "y": 471,
+          "mass": 2
+        },
+        {
+          "x": 468,
+          "y": 453.5,
+          "mass": 10
+        },
+        {
+          "x": 557,
+          "y": 431.8,
+          "mass": 1
+        },
+        {
+          "x": 563,
+          "y": 340.7,
+          "mass": 200
+        }
+      ],
+      "constraints": {
+        "rod": [
+          {
+            "p1": 0,
+            "p2": 1
+          },
+          {
+            "p1": 0,
+            "p2": 2
+          },
+          {
+            "p1": 1,
+            "p2": 3
+          },
+          {
+            "p1": 2,
+            "p2": 4
+          },
+          {
+            "p1": 1,
+            "p2": 2
+          },
+          {
+            "p1": 0,
+            "p2": 3,
+            "oneway": true
+          },
+          {
+            "p1": 0,
+            "p2": 4,
+            "oneway": true
+          }
+        ],
+        "slider": [
+          {
+            "p": 0,
+            "normal": {
+              "x": 0,
+              "y": 1
+            }
+          },
+          {
+            "p": 4,
+            "normal": {
+              "x": 0.6,
+              "y": 0
+            }
+          }
+        ],
+        "pin": [],
+        "colinear": [],
+        "f2k": [],
+        "rope": []
+      }
+    },
+    "Double Pulley": {
+      "projectile": 4,
+      "mainaxle": 0,
+      "armtip": 1,
+      "axleheight": 8,
+      "timestep": 0.2,
+      "duration": 35,
+      "particles": [
+        {
+          "x": 546.3,
+          "y": 584.3,
+          "mass": 1
+        },
+        {
+          "x": 320,
+          "y": 750,
+          "mass": 2
+        },
+        {
+          "x": 560.6,
+          "y": 481.2,
+          "mass": 10
+        },
+        {
+          "x": 100,
+          "y": 680,
+          "mass": 1
+        },
+        {
+          "x": 900,
+          "y": 700,
+          "mass": 1
+        },
+        {
+          "x": 645.5,
+          "y": 541,
+          "mass": 500
+        },
+        {
+          "x": 150,
+          "y": 650,
+          "mass": 1
+        }
+      ],
+      "constraints": {
+        "rod": [
+          {
+            "p1": 0,
+            "p2": 1
+          },
+          {
+            "p1": 0,
+            "p2": 2
+          },
+          {
+            "p1": 2,
+            "p2": 5
+          },
+          {
+            "p1": 1,
+            "p2": 2
+          },
+          {
+            "p1": 0,
+            "p2": 5,
+            "oneway": true
+          }
+        ],
+        "slider": [
+          {
+            "p": 4,
+            "normal": {
+              "x": 0,
+              "y": 1
+            },
+            "oneway": true
+          }
+        ],
+        "rope": [
+          {
+            "p1": 3,
+            "pulleys": [
+              {
+                "idx": 1,
+                "wrapping": "both"
+              }
+            ],
+            "p3": 4
+          },
+          {
+            "p1": 6,
+            "pulleys": [
+              {
+                "idx": 2,
+                "wrapping": "both"
+              }
+            ],
+            "p3": 4
+          }
+        ],
+        "pin": [
+          {
+            "count": 2,
+            "p": 0
+          },
+          {
+            "count": 2,
+            "p": 3
+          },
+          {
+            "count": 2,
+            "p": 6
+          }
+        ],
+        "colinear": [],
+        "f2k": []
+      }
+    },
+    "FAT + Pulley Hybrid": {
+      "projectile": 3,
+      "mainaxle": 0,
+      "armtip": 1,
+      "axleheight": 8,
+      "timestep": 0.2,
+      "duration": 35,
+      "particles": [
+        {
+          "x": 487,
+          "y": 517,
+          "mass": 1
+        },
+        {
+          "x": 346,
+          "y": 657.6,
+          "mass": 2
+        },
+        {
+          "x": 589,
+          "y": 444.7,
+          "mass": 100
+        },
+        {
+          "x": 800,
+          "y": 673.6,
+          "mass": 1
+        },
+        {
+          "x": 100,
+          "y": 600,
+          "mass": 1
+        }
+      ],
+      "constraints": {
+        "rod": [
+          {
+            "p1": 0,
+            "p2": 1
+          },
+          {
+            "p1": 0,
+            "p2": 2
+          },
+          {
+            "p1": 1,
+            "p2": 2
+          }
+        ],
+        "slider": [
+          {
+            "p": 0,
+            "normal": {
+              "x": 0,
+              "y": 1
+            }
+          },
+          {
+            "p": 2,
+            "normal": {
+              "x": 0.6,
+              "y": 0
+            }
+          },
+          {
+            "p": 3,
+            "normal": {
+              "x": 0,
+              "y": 1
+            },
+            "oneway": true
+          }
+        ],
+        "rope": [
+          {
+            "p1": 4,
+            "pulleys": [
+              {
+                "idx": 1,
+                "wrapping": "both"
+              }
+            ],
+            "p3": 3
+          }
+        ],
+        "pin": [
+          {
+            "count": 2,
+            "p": 4
+          }
+        ],
+        "colinear": [],
+        "f2k": []
+      }
+    },
+    "Compact Heavy": {
+      "projectile": 3,
+      "mainaxle": 0,
+      "armtip": 1,
+      "axleheight": 8,
+      "timestep": 0.2,
+      "duration": 35,
+      "particles": [
+        {
+          "x": 500,
+          "y": 500,
+          "mass": 1
+        },
+        {
+          "x": 350,
+          "y": 600,
+          "mass": 2
+        },
+        {
+          "x": 520,
+          "y": 450,
+          "mass": 15
+        },
+        {
+          "x": 750,
+          "y": 650,
+          "mass": 1
+        },
+        {
+          "x": 550,
+          "y": 400,
+          "mass": 800
+        },
+        {
+          "x": 120,
+          "y": 550,
+          "mass": 1
+        }
+      ],
+      "constraints": {
+        "rod": [
+          {
+            "p1": 0,
+            "p2": 1
+          },
+          {
+            "p1": 0,
+            "p2": 2
+          },
+          {
+            "p1": 2,
+            "p2": 4
+          },
+          {
+            "p1": 1,
+            "p2": 2
+          },
+          {
+            "p1": 0,
+            "p2": 4,
+            "oneway": true
+          }
+        ],
+        "slider": [
+          {
+            "p": 3,
+            "normal": {
+              "x": 0,
+              "y": 1
+            },
+            "oneway": true
+          }
+        ],
+        "rope": [
+          {
+            "p1": 5,
+            "pulleys": [
+              {
+                "idx": 1,
+                "wrapping": "both"
+              }
+            ],
+            "p3": 3
+          }
+        ],
+        "pin": [
+          {
+            "count": 2,
+            "p": 0
+          },
+          {
+            "count": 2,
+            "p": 5
+          }
+        ],
+        "colinear": [],
+        "f2k": []
+      }
+    }
+  },
+  "results": [
+    {
+      "name": "Double Pulley",
+      "range": 2101.2016103345522,
+      "peakLoad": 471468.9110555365,
+      "efficiency": 0.004456712968900387,
+      "particles": 7,
+      "armtipMass": 2,
+      "counterweightMass": 500,
+      "valid": true
+    },
+    {
+      "name": "Compact Heavy",
+      "range": 1138.0856655957193,
+      "peakLoad": 11981.595430208912,
+      "efficiency": 0.09498615374095264,
+      "particles": 6,
+      "armtipMass": 2,
+      "counterweightMass": 800,
+      "valid": true
+    },
+    {
+      "name": "FAT + Pulley Hybrid",
+      "range": 780.2624065943592,
+      "peakLoad": 2744.189517641307,
+      "efficiency": 0.28433255122445494,
+      "particles": 5,
+      "armtipMass": 2,
+      "counterweightMass": 100,
+      "valid": true
+    },
+    {
+      "name": "NASAW Modified",
+      "range": 601.6061311186032,
+      "peakLoad": 9391.949546440534,
+      "efficiency": 0.06405551138704814,
+      "particles": 5,
+      "armtipMass": 2,
+      "counterweightMass": 200,
+      "valid": true
+    }
+  ]
+}
