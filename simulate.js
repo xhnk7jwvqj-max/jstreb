@@ -533,42 +533,65 @@ function computeAccelerationSlider(slider, system) {
 function computeEffectRopeDrum(result, ropedrum, system) {
   // Constraint: sqrt(|p1-p2|^2 - r^2) + r*arcAngle(tangent, p3) = totalLength
   // This properly models a rope wrapping tangentially around a drum
-  // Gradients derived symbolically (see science/ropedrum_manual_derivation.py)
+  // Gradients derived using SymPy (see science/ropedrum_constraint_derivation.py)
+  // IMPORTANT: These are the EXACT formulas from SymPy, translated directly to JS
 
   let pos1 = pget(system.positions, ropedrum.p1);
   let pos2 = pget(system.positions, ropedrum.p2);
   let pos3 = pget(system.positions, ropedrum.p3);
   let r = ropedrum.radius;
 
-  // Positions relative to drum center (p2)
-  let dx = pos1[0] - pos2[0];  // x1 - x2
-  let dy = pos1[1] - pos2[1];  // y1 - y2
-  let dx3 = pos3[0] - pos2[0]; // x3 - x2
-  let dy3 = pos3[1] - pos2[1]; // y3 - y2
+  // Define position differences (matching SymPy variable names)
+  let x1 = pos1[0], y1 = pos1[1];
+  let x2 = pos2[0], y2 = pos2[1];
+  let x3 = pos3[0], y3 = pos3[1];
 
-  // Common terms
-  let d2 = dx * dx + dy * dy;
-  let d = Math.sqrt(d2);
-  let d3 = d2 * d;
-  let r2 = r * r;
-  let tangentLength = Math.sqrt(d2 - r2);
+  // Common subexpressions (compute once, use multiple times)
+  let dx = x1 - x2;
+  let dy = y1 - y2;
+  let dx3 = x3 - x2;
+  let dy3 = y3 - y2;
 
-  // Gradients from symbolic derivation:
-  // ∂C/∂x1 = dx/tangent_length + r*dy/d² - r²*dx/(d³*tangent_length)
-  // ∂C/∂y1 = dy/tangent_length - r*dx/d² - r²*dy/(d³*tangent_length)
-  // ∂C/∂x2 = -dx/tangent_length + dy3/r + r*dy/d² - r²*dx/(d³*tangent_length)
-  // ∂C/∂y2 = -dy/tangent_length - dx3/r - r*dx/d² - r²*dy/(d³*tangent_length)
-  // ∂C/∂x3 = -dy3/r
-  // ∂C/∂y3 = dx3/r
+  let dx_sq = dx * dx;
+  let dy_sq = dy * dy;
+  let d_sq = dx_sq + dy_sq;  // (x1-x2)^2 + (y1-y2)^2
 
-  let dC_dp1_x = dx / tangentLength + r * dy / d2 - r2 * dx / (d3 * tangentLength);
-  let dC_dp1_y = dy / tangentLength - r * dx / d2 - r2 * dy / (d3 * tangentLength);
+  let dx3_sq = dx3 * dx3;
+  let dy3_sq = dy3 * dy3;
+  let d3_sq = dx3_sq + dy3_sq;  // (x3-x2)^2 + (y3-y2)^2
 
-  let dC_dp2_x = -dx / tangentLength + dy3 / r + r * dy / d2 - r2 * dx / (d3 * tangentLength);
-  let dC_dp2_y = -dy / tangentLength - dx3 / r - r * dx / d2 - r2 * dy / (d3 * tangentLength);
+  let r_sq = r * r;
+  let tangent_length_sq = d_sq - r_sq;  // d^2 - r^2
+  let tangent_length = Math.sqrt(tangent_length_sq);
 
-  let dC_dp3_x = -dy3 / r;
-  let dC_dp3_y = dx3 / r;
+  let d_sq_pow_3_2 = d_sq * Math.sqrt(d_sq);  // d^3
+
+  // Term that appears in multiple gradients: sqrt(1 - r^2/d^2)
+  let sqrt_term = Math.sqrt(1 - r_sq / d_sq);  // = sqrt((d^2 - r^2)/d^2) = tangent_length/d
+
+  // SymPy formula for ∂C/∂x1:
+  // -r*(r*(x1 - x2)/(sqrt(-r**2/((x1 - x2)**2 + (y1 - y2)**2) + 1)*((x1 - x2)**2 + (y1 - y2)**2)**(3/2)) - (y1 - y2)/((x1 - x2)**2 + (y1 - y2)**2)) + (x1 - x2)/sqrt(-r**2 + (x1 - x2)**2 + (y1 - y2)**2)
+  let dC_dp1_x = -r * (r * dx / (sqrt_term * d_sq_pow_3_2) - dy / d_sq) + dx / tangent_length;
+
+  // SymPy formula for ∂C/∂y1:
+  // -r*(r*(y1 - y2)/(sqrt(-r**2/((x1 - x2)**2 + (y1 - y2)**2) + 1)*((x1 - x2)**2 + (y1 - y2)**2)**(3/2)) + (x1 - x2)/((x1 - x2)**2 + (y1 - y2)**2)) + (y1 - y2)/sqrt(-r**2 + (x1 - x2)**2 + (y1 - y2)**2)
+  let dC_dp1_y = -r * (r * dy / (sqrt_term * d_sq_pow_3_2) + dx / d_sq) + dy / tangent_length;
+
+  // SymPy formula for ∂C/∂x2:
+  // -r*(-r*(x1 - x2)/(sqrt(-r**2/((x1 - x2)**2 + (y1 - y2)**2) + 1)*((x1 - x2)**2 + (y1 - y2)**2)**(3/2)) + (y1 - y2)/((x1 - x2)**2 + (y1 - y2)**2) + (y2 - y3)/((x2 - x3)**2 + (y2 - y3)**2)) - (x1 - x2)/sqrt(-r**2 + (x1 - x2)**2 + (y1 - y2)**2)
+  let dC_dp2_x = -r * (-r * dx / (sqrt_term * d_sq_pow_3_2) + dy / d_sq + (y2 - y3) / d3_sq) - dx / tangent_length;
+
+  // SymPy formula for ∂C/∂y2:
+  // r*(r*(y1 - y2)/(sqrt(-r**2/((x1 - x2)**2 + (y1 - y2)**2) + 1)*((x1 - x2)**2 + (y1 - y2)**2)**(3/2)) + (x1 - x2)/((x1 - x2)**2 + (y1 - y2)**2) + (x2 - x3)/((x2 - x3)**2 + (y2 - y3)**2)) - (y1 - y2)/sqrt(-r**2 + (x1 - x2)**2 + (y1 - y2)**2)
+  let dC_dp2_y = r * (r * dy / (sqrt_term * d_sq_pow_3_2) + dx / d_sq + (x2 - x3) / d3_sq) - dy / tangent_length;
+
+  // SymPy formula for ∂C/∂x3:
+  // r*(y2 - y3)/((x2 - x3)**2 + (y2 - y3)**2)
+  let dC_dp3_x = r * (y2 - y3) / d3_sq;
+
+  // SymPy formula for ∂C/∂y3:
+  // -r*(x2 - x3)/((x2 - x3)**2 + (y2 - y3)**2)
+  let dC_dp3_y = -r * (x2 - x3) / d3_sq;
 
   sparsepset(result, [dC_dp1_x, dC_dp1_y], ropedrum.p1);
   sparsepset(result, [dC_dp2_x, dC_dp2_y], ropedrum.p2);
