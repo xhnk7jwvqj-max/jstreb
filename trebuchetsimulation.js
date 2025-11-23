@@ -2,7 +2,7 @@
  * Shared trebuchet simulation utilities
  */
 
-const ctypes = ["rod", "pin", "slider", "colinear", "f2k", "rope", "ropedrum"];
+const ctypes = ["rod", "pin", "slider", "colinear", "f2k", "rope", "ropedrum", "ropedrumY"];
 
 /**
  * Fill in missing constraint types and handle pin constraints from sliders

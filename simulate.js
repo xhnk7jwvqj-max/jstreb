@@ -87,6 +87,15 @@ function RopeDrum(p1, p2, p3, radius, totalLength) {
   this.name = "RopeDrum";
 }
 
+function RopeDrumY(p1, p2, p3, radius, totalLength) {
+  this.p1 = p1; // free end of rope
+  this.p2 = p2; // center of drum
+  this.p3 = p3; // point on circumference of drum
+  this.radius = radius; // drum radius
+  this.totalLength = totalLength; // total rope length (tangent + arc)
+  this.name = "RopeDrumY";
+}
+
 function System(constraints, masses, positions, velocities) {
   this.forces = Array(masses.length).fill([0, -1]).flat(); // Assuming a default force
   this.constraints = constraints;
@@ -104,6 +113,7 @@ export function convertBack(sysConstraints) {
     rope: [],
     pin: [],
     ropedrum: [],
+    ropedrumY: [],
   };
 
   for (let constraint of sysConstraints) {
@@ -151,6 +161,15 @@ export function convertBack(sysConstraints) {
         break;
       case "RopeDrum":
         constraints.ropedrum.push({
+          p1: constraint.p1,
+          p2: constraint.p2,
+          p3: constraint.p3,
+          radius: constraint.radius,
+          totalLength: constraint.totalLength,
+        });
+        break;
+      case "RopeDrumY":
+        constraints.ropedrumY.push({
           p1: constraint.p1,
           p2: constraint.p2,
           p3: constraint.p3,
@@ -209,6 +228,9 @@ export function simulate(
   }
   for (var ropedrum of constraints.ropedrum) {
     sysConstraints.push(new RopeDrum(ropedrum.p1, ropedrum.p2, ropedrum.p3, ropedrum.radius, ropedrum.totalLength));
+  }
+  for (var ropedrumY of constraints.ropedrumY) {
+    sysConstraints.push(new RopeDrumY(ropedrumY.p1, ropedrumY.p2, ropedrumY.p3, ropedrumY.radius, ropedrumY.totalLength));
   }
 
   var system = new System(
@@ -307,6 +329,9 @@ function dvdt(system) {
     if (constraint.name === "RopeDrum") {
        computeEffectRopeDrum(row, constraint, system);
     }
+    if (constraint.name === "RopeDrumY") {
+       computeEffectRopeDrumY(row, constraint, system);
+    }
   }
   var interactions2 = sparseDotDivide(interactions, system.masses);
   interactions2 = multiplyTransposeSameSparsity(interactions2, interactions);
@@ -335,6 +360,9 @@ function dvdt(system) {
     }
     if (constraint.name === "RopeDrum") {
       desires[constr] = computeAccelerationRopeDrum(constraint, system);
+    }
+    if (constraint.name === "RopeDrumY") {
+      desires[constr] = computeAccelerationRopeDrumY(constraint, system);
     }
   }
   let constraintForces = naiveSolve(interactions2, desires);
@@ -600,6 +628,60 @@ function computeEffectRopeDrum(result, ropedrum, system) {
   return result;
 }
 
+function computeEffectRopeDrumY(result, ropedrum, system) {
+  // Mirrored version of RopeDrum (x and y swapped)
+  // Exact SymPy-derived formulas with x↔y throughout
+
+  let pos1 = pget(system.positions, ropedrum.p1);
+  let pos2 = pget(system.positions, ropedrum.p2);
+  let pos3 = pget(system.positions, ropedrum.p3);
+  let r = ropedrum.radius;
+
+  // Extract coordinates (SWAPPED: y comes first, then x)
+  let y1 = pos1[0], x1 = pos1[1];
+  let y2 = pos2[0], x2 = pos2[1];
+  let y3 = pos3[0], x3 = pos3[1];
+
+  // Common subexpressions (x and y swapped)
+  let dx = x1 - x2;
+  let dy = y1 - y2;
+  let dx3 = x3 - x2;
+  let dy3 = y3 - y2;
+
+  let dx_sq = dx * dx;
+  let dy_sq = dy * dy;
+  let d_sq = dx_sq + dy_sq;
+
+  let dx3_sq = dx3 * dx3;
+  let dy3_sq = dy3 * dy3;
+  let d3_sq = dx3_sq + dy3_sq;
+
+  let r_sq = r * r;
+  let tangent_length_sq = d_sq - r_sq;
+  let tangent_length = Math.sqrt(tangent_length_sq);
+
+  let d_sq_pow_3_2 = d_sq * Math.sqrt(d_sq);
+
+  let sqrt_term = Math.sqrt(1 - r_sq / d_sq);
+
+  // Same formulas as RopeDrum (with x and y already swapped above)
+  let dC_dp1_x = -r * (r * dx / (sqrt_term * d_sq_pow_3_2) - dy / d_sq) + dx / tangent_length;
+  let dC_dp1_y = -r * (r * dy / (sqrt_term * d_sq_pow_3_2) + dx / d_sq) + dy / tangent_length;
+
+  let dC_dp2_x = -r * (-r * dx / (sqrt_term * d_sq_pow_3_2) + dy / d_sq + (y2 - y3) / d3_sq) - dx / tangent_length;
+  let dC_dp2_y = r * (r * dy / (sqrt_term * d_sq_pow_3_2) + dx / d_sq + (x2 - x3) / d3_sq) - dy / tangent_length;
+
+  let dC_dp3_x = r * (y2 - y3) / d3_sq;
+  let dC_dp3_y = -r * (x2 - x3) / d3_sq;
+
+  // SWAP back when setting results (first index is x/y in result array)
+  sparsepset(result, [dC_dp1_y, dC_dp1_x], ropedrum.p1);
+  sparsepset(result, [dC_dp2_y, dC_dp2_x], ropedrum.p2);
+  sparsepset(result, [dC_dp3_y, dC_dp3_x], ropedrum.p3);
+
+  return result;
+}
+
 function computeAccelerationRopeDrum(ropedrum, system) {
   // EXACT SymPy-derived acceleration formula
   // d²C/dt² computed symbolically (see science/ropedrum_acceleration_exact.py)
@@ -625,6 +707,34 @@ function computeAccelerationRopeDrum(ropedrum, system) {
 
   // Exact SymPy-derived acceleration formula
   // d²C/dt² at t=0 (no manual simplification!)
+  let acceleration = r*((1/2)*Math.pow(r, 3)*(-(2*vx1 - 2*vx2)*(x1 - x2) - (2*vy1 - 2*vy2)*(y1 - y2))*(-1/2*(2*vx1 - 2*vx2)*(x1 - x2) - 1/2*(2*vy1 - 2*vy2)*(y1 - y2))/(Math.pow(-Math.pow(r, 2)/(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2)) + 1, 3/2)*Math.pow(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2), 7/2)) + r*(-1/2*(vx1 - vx2)*(2*vx1 - 2*vx2) - 1/2*(vy1 - vy2)*(2*vy1 - 2*vy2))/(Math.sqrt(-Math.pow(r, 2)/(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2)) + 1)*Math.pow(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2), 3/2)) + r*(-3/2*(2*vx1 - 2*vx2)*(x1 - x2) - 3/2*(2*vy1 - 2*vy2)*(y1 - y2))*(-1/2*(2*vx1 - 2*vx2)*(x1 - x2) - 1/2*(2*vy1 - 2*vy2)*(y1 - y2))/(Math.sqrt(-Math.pow(r, 2)/(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2)) + 1)*Math.pow(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2), 5/2)) - (vx1 - vx2)*(-vy1 + vy2)/(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2)) - (vx1 - vx2)*(vy1 - vy2)/(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2)) - (vx1 - vx2)*(-y1 + y2)*(-(2*vx1 - 2*vx2)*(x1 - x2) - (2*vy1 - 2*vy2)*(y1 - y2))/Math.pow(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2), 2) + (-vx2 + vx3)*(-vy2 + vy3)/(Math.pow(-x2 + x3, 2) + Math.pow(-y2 + y3, 2)) + (-vx2 + vx3)*(vy2 - vy3)/(Math.pow(-x2 + x3, 2) + Math.pow(-y2 + y3, 2)) + (-vx2 + vx3)*(y2 - y3)*(-(-2*vx2 + 2*vx3)*(-x2 + x3) - (-2*vy2 + 2*vy3)*(-y2 + y3))/Math.pow(Math.pow(-x2 + x3, 2) + Math.pow(-y2 + y3, 2), 2) - (vy1 - vy2)*(x1 - x2)*(-(2*vx1 - 2*vx2)*(x1 - x2) - (2*vy1 - 2*vy2)*(y1 - y2))/Math.pow(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2), 2) + (-vy2 + vy3)*(-x2 + x3)*(-(-2*vx2 + 2*vx3)*(-x2 + x3) - (-2*vy2 + 2*vy3)*(-y2 + y3))/Math.pow(Math.pow(-x2 + x3, 2) + Math.pow(-y2 + y3, 2), 2)) + ((1/2)*(vx1 - vx2)*(2*vx1 - 2*vx2) + (1/2)*(vy1 - vy2)*(2*vy1 - 2*vy2))/Math.sqrt(-Math.pow(r, 2) + Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2)) + (-1/2*(2*vx1 - 2*vx2)*(x1 - x2) - 1/2*(2*vy1 - 2*vy2)*(y1 - y2))*((1/2)*(2*vx1 - 2*vx2)*(x1 - x2) + (1/2)*(2*vy1 - 2*vy2)*(y1 - y2))/Math.pow(-Math.pow(r, 2) + Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2), 3/2);
+
+  return acceleration;
+}
+
+function computeAccelerationRopeDrumY(ropedrum, system) {
+  // Mirrored version of RopeDrum acceleration (x and y swapped)
+  // EXACT SymPy-derived formula with x↔y throughout
+
+  let pos1 = pget(system.positions, ropedrum.p1);
+  let pos2 = pget(system.positions, ropedrum.p2);
+  let pos3 = pget(system.positions, ropedrum.p3);
+
+  let vel1 = pget(system.velocities, ropedrum.p1);
+  let vel2 = pget(system.velocities, ropedrum.p2);
+  let vel3 = pget(system.velocities, ropedrum.p3);
+
+  let r = ropedrum.radius;
+
+  // Extract coordinates SWAPPED (y from [0], x from [1])
+  let y1 = pos1[0], x1 = pos1[1];
+  let y2 = pos2[0], x2 = pos2[1];
+  let y3 = pos3[0], x3 = pos3[1];
+  let vy1 = vel1[0], vx1 = vel1[1];
+  let vy2 = vel2[0], vx2 = vel2[1];
+  let vy3 = vel3[0], vx3 = vel3[1];
+
+  // Same exact formula as RopeDrum (x and y already swapped above)
   let acceleration = r*((1/2)*Math.pow(r, 3)*(-(2*vx1 - 2*vx2)*(x1 - x2) - (2*vy1 - 2*vy2)*(y1 - y2))*(-1/2*(2*vx1 - 2*vx2)*(x1 - x2) - 1/2*(2*vy1 - 2*vy2)*(y1 - y2))/(Math.pow(-Math.pow(r, 2)/(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2)) + 1, 3/2)*Math.pow(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2), 7/2)) + r*(-1/2*(vx1 - vx2)*(2*vx1 - 2*vx2) - 1/2*(vy1 - vy2)*(2*vy1 - 2*vy2))/(Math.sqrt(-Math.pow(r, 2)/(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2)) + 1)*Math.pow(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2), 3/2)) + r*(-3/2*(2*vx1 - 2*vx2)*(x1 - x2) - 3/2*(2*vy1 - 2*vy2)*(y1 - y2))*(-1/2*(2*vx1 - 2*vx2)*(x1 - x2) - 1/2*(2*vy1 - 2*vy2)*(y1 - y2))/(Math.sqrt(-Math.pow(r, 2)/(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2)) + 1)*Math.pow(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2), 5/2)) - (vx1 - vx2)*(-vy1 + vy2)/(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2)) - (vx1 - vx2)*(vy1 - vy2)/(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2)) - (vx1 - vx2)*(-y1 + y2)*(-(2*vx1 - 2*vx2)*(x1 - x2) - (2*vy1 - 2*vy2)*(y1 - y2))/Math.pow(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2), 2) + (-vx2 + vx3)*(-vy2 + vy3)/(Math.pow(-x2 + x3, 2) + Math.pow(-y2 + y3, 2)) + (-vx2 + vx3)*(vy2 - vy3)/(Math.pow(-x2 + x3, 2) + Math.pow(-y2 + y3, 2)) + (-vx2 + vx3)*(y2 - y3)*(-(-2*vx2 + 2*vx3)*(-x2 + x3) - (-2*vy2 + 2*vy3)*(-y2 + y3))/Math.pow(Math.pow(-x2 + x3, 2) + Math.pow(-y2 + y3, 2), 2) - (vy1 - vy2)*(x1 - x2)*(-(2*vx1 - 2*vx2)*(x1 - x2) - (2*vy1 - 2*vy2)*(y1 - y2))/Math.pow(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2), 2) + (-vy2 + vy3)*(-x2 + x3)*(-(-2*vx2 + 2*vx3)*(-x2 + x3) - (-2*vy2 + 2*vy3)*(-y2 + y3))/Math.pow(Math.pow(-x2 + x3, 2) + Math.pow(-y2 + y3, 2), 2)) + ((1/2)*(vx1 - vx2)*(2*vx1 - 2*vx2) + (1/2)*(vy1 - vy2)*(2*vy1 - 2*vy2))/Math.sqrt(-Math.pow(r, 2) + Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2)) + (-1/2*(2*vx1 - 2*vx2)*(x1 - x2) - 1/2*(2*vy1 - 2*vy2)*(y1 - y2))*((1/2)*(2*vx1 - 2*vx2)*(x1 - x2) + (1/2)*(2*vy1 - 2*vy2)*(y1 - y2))/Math.pow(-Math.pow(r, 2) + Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2), 3/2);
 
   return acceleration;
