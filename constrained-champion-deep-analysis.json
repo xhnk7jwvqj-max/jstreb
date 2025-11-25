@@ -1,0 +1,35 @@
+{
+  "range": 562366.4622431174,
+  "rangeInMiles": 106.50879966725708,
+  "peakLoad": 14940.06988246115,
+  "masses": {
+    "projectile": 25.026472503061264,
+    "counterweight": 587.6623726182665,
+    "total": 612.6888451213279,
+    "ratio": 23.481630203632697
+  },
+  "energy": {
+    "initial": -336776.6577669772,
+    "launchKE": 80435.45084732586,
+    "efficiency": -23.883915049415577
+  },
+  "launch": {
+    "speed": 80.174992526592,
+    "mach": 0.2337463338967697,
+    "angle": -52.458700925422235,
+    "vx": 48.853278641610125,
+    "vy": -63.571900967363604
+  },
+  "plausibility": {
+    "realistic": false,
+    "issues": [
+      "Energy conservation violated",
+      "Range exceeds physical limits (106.51 miles)"
+    ]
+  },
+  "simulation": {
+    "steps": 117,
+    "duration": 35.1,
+    "timestep": 0.3
+  }
+}
