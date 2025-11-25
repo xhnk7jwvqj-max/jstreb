@@ -1,0 +1,841 @@
+{
+  "champion": {
+    "presetName": "Champion (Discovered)",
+    "baselineRange": 20096.029900668804,
+    "perturbationSize": 0.01,
+    "numPerturbations": 5,
+    "avgMaxDivergence": 0.927989295977967,
+    "avgFinalDivergence": 0.1724320108791822,
+    "avgGrowthRate": 0.0618939901972269,
+    "avgDoublingTime": 12.479999999999999,
+    "avgRangeDifference": 1955.5948849049698,
+    "baselineTrajectoryLength": 117,
+    "individualResults": [
+      {
+        "initialDivergence": 0.016415365958001586,
+        "maxDivergence": 0.5105159091510859,
+        "finalDivergence": 0.07605654452952801,
+        "avgDivergence": 0.04077308205503425,
+        "growthRate": 0.044059173154926794,
+        "doubling_time": 8.1,
+        "trajectoryLength": 117,
+        "finalVelocityDivergence": 0.0055600086541406695,
+        "rangeDifference": 924.6718633462951
+      },
+      {
+        "initialDivergence": 0.0128594807160311,
+        "maxDivergence": 0.5378610197569884,
+        "finalDivergence": 0.06225389914066874,
+        "avgDivergence": 0.02925673323195329,
+        "growthRate": 0.045320110113987656,
+        "doubling_time": 25.8,
+        "trajectoryLength": 117,
+        "finalVelocityDivergence": 0.007340635883607149,
+        "rangeDifference": 254.64286437192277
+      },
+      {
+        "initialDivergence": 0.02107148166755823,
+        "maxDivergence": 1.60036775576049,
+        "finalDivergence": 0.23760947501573568,
+        "avgDivergence": 0.11579955513958652,
+        "growthRate": 0.0696180436255181,
+        "doubling_time": 9.299999999999999,
+        "trajectoryLength": 117,
+        "finalVelocityDivergence": 0.017186493264552544,
+        "rangeDifference": 4182.825088686341
+      },
+      {
+        "initialDivergence": 0.01706281298111689,
+        "maxDivergence": 0.7696565275692484,
+        "finalDivergence": 0.26542674360279106,
+        "avgDivergence": 0.10501487787177656,
+        "growthRate": 0.07886314563170412,
+        "doubling_time": 9.9,
+        "trajectoryLength": 117,
+        "finalVelocityDivergence": 0.02032586086758216,
+        "rangeDifference": 1496.4722847621997
+      },
+      {
+        "initialDivergence": 0.01827087231147164,
+        "maxDivergence": 1.2215452676520222,
+        "finalDivergence": 0.22081339210718753,
+        "avgDivergence": 0.10351431789363703,
+        "growthRate": 0.07160947845999781,
+        "doubling_time": 9.299999999999999,
+        "trajectoryLength": 117,
+        "finalVelocityDivergence": 0.01610323932256317,
+        "rangeDifference": 2919.362323358091
+      }
+    ]
+  },
+  "presets": [
+    {
+      "presetName": "Hinged Counterweight",
+      "baselineRange": 331.2083903696846,
+      "perturbationSize": 0.01,
+      "numPerturbations": 5,
+      "avgMaxDivergence": 0.15448266766008853,
+      "avgFinalDivergence": 0.15448266766008853,
+      "avgGrowthRate": 0.05460034514591616,
+      "avgDoublingTime": 21.660000000000004,
+      "avgRangeDifference": 0.06528383731752001,
+      "baselineTrajectoryLength": 117,
+      "individualResults": [
+        {
+          "initialDivergence": 0.01818773243242544,
+          "maxDivergence": 0.03818511915891386,
+          "finalDivergence": 0.03818511915891386,
+          "avgDivergence": 0.027378166659973772,
+          "growthRate": 0.02131317713403339,
+          "doubling_time": 34.5,
+          "trajectoryLength": 117,
+          "finalVelocityDivergence": 0.01330684371168209,
+          "rangeDifference": 0.02736456127939846
+        },
+        {
+          "initialDivergence": 0.019750692103311235,
+          "maxDivergence": 0.13703996356694606,
+          "finalDivergence": 0.13703996356694606,
+          "avgDivergence": 0.051801965737364924,
+          "growthRate": 0.055663334891378945,
+          "doubling_time": 18.9,
+          "trajectoryLength": 117,
+          "finalVelocityDivergence": 0.045346869305501254,
+          "rangeDifference": 0.02080730198343872
+        },
+        {
+          "initialDivergence": 0.01724914198483578,
+          "maxDivergence": 0.1058047216543261,
+          "finalDivergence": 0.1058047216543261,
+          "avgDivergence": 0.04010457417457919,
+          "growthRate": 0.05212163058363058,
+          "doubling_time": 19.8,
+          "trajectoryLength": 117,
+          "finalVelocityDivergence": 0.024498328800724802,
+          "rangeDifference": 0.014799737629061838
+        },
+        {
+          "initialDivergence": 0.01827351027727979,
+          "maxDivergence": 0.2380642376261334,
+          "finalDivergence": 0.2380642376261334,
+          "avgDivergence": 0.06204364013684975,
+          "growthRate": 0.07376689821573344,
+          "doubling_time": 17.7,
+          "trajectoryLength": 117,
+          "finalVelocityDivergence": 0.03789871572115996,
+          "rangeDifference": 0.12015830024085972
+        },
+        {
+          "initialDivergence": 0.0220628257404595,
+          "maxDivergence": 0.2533192962941233,
+          "finalDivergence": 0.2533192962941233,
+          "avgDivergence": 0.06449956959233766,
+          "growthRate": 0.07013668490480447,
+          "doubling_time": 17.4,
+          "trajectoryLength": 117,
+          "finalVelocityDivergence": 0.039774340391673775,
+          "rangeDifference": 0.14328928545484132
+        }
+      ]
+    },
+    {
+      "presetName": "Fixed Counterweight",
+      "baselineRange": 304.163905584483,
+      "perturbationSize": 0.01,
+      "numPerturbations": 5,
+      "avgMaxDivergence": 0.08443773242541583,
+      "avgFinalDivergence": 0.08287625739734669,
+      "avgGrowthRate": 0.04365281697753699,
+      "avgDoublingTime": 22.02,
+      "avgRangeDifference": 0.02337457495873423,
+      "baselineTrajectoryLength": 117,
+      "individualResults": [
+        {
+          "initialDivergence": 0.0151144152068002,
+          "maxDivergence": 0.12885392242879729,
+          "finalDivergence": 0.12885392242879729,
+          "avgDivergence": 0.04461921184633059,
+          "growthRate": 0.061581334499064104,
+          "doubling_time": 17.4,
+          "trajectoryLength": 117,
+          "finalVelocityDivergence": 0.02879725649728911,
+          "rangeDifference": 0.02835571046057339
+        },
+        {
+          "initialDivergence": 0.01933893786673564,
+          "maxDivergence": 0.07555873544518765,
+          "finalDivergence": 0.07555873544518765,
+          "avgDivergence": 0.030434499780076157,
+          "growthRate": 0.03916062463206009,
+          "doubling_time": 27.599999999999998,
+          "trajectoryLength": 117,
+          "finalVelocityDivergence": 0.013392183062109321,
+          "rangeDifference": 0.01833544414790822
+        },
+        {
+          "initialDivergence": 0.020140023696023225,
+          "maxDivergence": 0.10518691018531258,
+          "finalDivergence": 0.09737953504496694,
+          "avgDivergence": 0.05739760817018892,
+          "growthRate": 0.045284684259832474,
+          "doubling_time": 15.299999999999999,
+          "trajectoryLength": 117,
+          "finalVelocityDivergence": 0.030521556729210732,
+          "rangeDifference": 0.0004758280514352009
+        },
+        {
+          "initialDivergence": 0.013989897777321524,
+          "maxDivergence": 0.059271087245744175,
+          "finalDivergence": 0.059271087245744175,
+          "avgDivergence": 0.025800443661598057,
+          "growthRate": 0.041488107407096506,
+          "doubling_time": 23.7,
+          "trajectoryLength": 117,
+          "finalVelocityDivergence": 0.017269463705785675,
+          "rangeDifference": 0.02750705135207454
+        },
+        {
+          "initialDivergence": 0.01828712548523872,
+          "maxDivergence": 0.05331800682203739,
+          "finalDivergence": 0.05331800682203739,
+          "avgDivergence": 0.028138970225798126,
+          "growthRate": 0.0307493340896318,
+          "doubling_time": 26.099999999999998,
+          "trajectoryLength": 117,
+          "finalVelocityDivergence": 0.015922413886758482,
+          "rangeDifference": 0.04219884078167979
+        }
+      ]
+    },
+    {
+      "presetName": "Floating Arm Trebuchet",
+      "baselineRange": 1120.5190993585682,
+      "perturbationSize": 0.01,
+      "numPerturbations": 5,
+      "avgMaxDivergence": 0.09549491359040987,
+      "avgFinalDivergence": 0.07838057726526643,
+      "avgGrowthRate": 0.045024231557928986,
+      "avgDoublingTime": 19.139999999999997,
+      "avgRangeDifference": 0.06741179107330027,
+      "baselineTrajectoryLength": 117,
+      "individualResults": [
+        {
+          "initialDivergence": 0.015437002777042122,
+          "maxDivergence": 0.09208333068169265,
+          "finalDivergence": 0.059100567853717846,
+          "avgDivergence": 0.04681781836646382,
+          "growthRate": 0.0385768140122112,
+          "doubling_time": 16.8,
+          "trajectoryLength": 117,
+          "finalVelocityDivergence": 0.03555303586055712,
+          "rangeDifference": 0.11208123200253794
+        },
+        {
+          "initialDivergence": 0.016160791635523534,
+          "maxDivergence": 0.09493213106191288,
+          "finalDivergence": 0.08855895639223664,
+          "avgDivergence": 0.038581050668081096,
+          "growthRate": 0.048881622554662336,
+          "doubling_time": 21.9,
+          "trajectoryLength": 117,
+          "finalVelocityDivergence": 0.05401863271495564,
+          "rangeDifference": 0.018421090658875983
+        },
+        {
+          "initialDivergence": 0.012300699513584422,
+          "maxDivergence": 0.0891143663319917,
+          "finalDivergence": 0.0891143663319917,
+          "avgDivergence": 0.029598942791219305,
+          "growthRate": 0.05690415022956395,
+          "doubling_time": 21,
+          "trajectoryLength": 117,
+          "finalVelocityDivergence": 0.041399893669954405,
+          "rangeDifference": 0.0050353174585779925
+        },
+        {
+          "initialDivergence": 0.019260398855368354,
+          "maxDivergence": 0.1519183020394127,
+          "finalDivergence": 0.11232814799097693,
+          "avgDivergence": 0.07169860406615552,
+          "growthRate": 0.050671648423680916,
+          "doubling_time": 17.099999999999998,
+          "trajectoryLength": 117,
+          "finalVelocityDivergence": 0.056000871707653985,
+          "rangeDifference": 0.16114997561066957
+        },
+        {
+          "initialDivergence": 0.015022258547734826,
+          "maxDivergence": 0.049426437837039504,
+          "finalDivergence": 0.04280084775740904,
+          "avgDivergence": 0.029124190025686867,
+          "growthRate": 0.030086922569526515,
+          "doubling_time": 18.9,
+          "trajectoryLength": 117,
+          "finalVelocityDivergence": 0.022793635991789216,
+          "rangeDifference": 0.04037133963583983
+        }
+      ]
+    },
+    {
+      "presetName": "F2k",
+      "baselineRange": 3857.674456167556,
+      "perturbationSize": 0.01,
+      "numPerturbations": 5,
+      "avgMaxDivergence": 0.10384397100913714,
+      "avgFinalDivergence": 0.06038544464391639,
+      "avgGrowthRate": 0.036387716350392604,
+      "avgDoublingTime": 23.52,
+      "avgRangeDifference": 0.6684519946773435,
+      "baselineTrajectoryLength": 59,
+      "individualResults": [
+        {
+          "initialDivergence": 0.016535179227023213,
+          "maxDivergence": 0.12724041968773353,
+          "finalDivergence": 0.06728491473508585,
+          "avgDivergence": 0.04238247265915352,
+          "growthRate": 0.04032890449270018,
+          "doubling_time": 21,
+          "trajectoryLength": 59,
+          "finalVelocityDivergence": 0.05829789787567693,
+          "rangeDifference": 0.8621401027935462
+        },
+        {
+          "initialDivergence": 0.014635338681595614,
+          "maxDivergence": 0.12062164297944496,
+          "finalDivergence": 0.0932495476136747,
+          "avgDivergence": 0.0370979873361325,
+          "growthRate": 0.05321379728206233,
+          "doubling_time": 23.4,
+          "trajectoryLength": 59,
+          "finalVelocityDivergence": 0.07908115676382464,
+          "rangeDifference": 0.4896359478175327
+        },
+        {
+          "initialDivergence": 0.019301007263948615,
+          "maxDivergence": 0.05891939441921566,
+          "finalDivergence": 0.04939102921943028,
+          "avgDivergence": 0.023919121390538402,
+          "growthRate": 0.027000331280582893,
+          "doubling_time": 30,
+          "trajectoryLength": 59,
+          "finalVelocityDivergence": 0.03271099012015889,
+          "rangeDifference": 0.6178120363733797
+        },
+        {
+          "initialDivergence": 0.013254856915341368,
+          "maxDivergence": 0.07486958538726941,
+          "finalDivergence": 0.03133191330108665,
+          "avgDivergence": 0.027975744004859127,
+          "growthRate": 0.024720492169044733,
+          "doubling_time": 21.599999999999998,
+          "trajectoryLength": 59,
+          "finalVelocityDivergence": 0.012670181151980079,
+          "rangeDifference": 0.4783877418744851
+        },
+        {
+          "initialDivergence": 0.01693113747321535,
+          "maxDivergence": 0.1375688125720222,
+          "finalDivergence": 0.06066981835030446,
+          "avgDivergence": 0.0434390784943296,
+          "growthRate": 0.03667505652757292,
+          "doubling_time": 21.599999999999998,
+          "trajectoryLength": 59,
+          "finalVelocityDivergence": 0.05765229408564158,
+          "rangeDifference": 0.8942841445277736
+        }
+      ]
+    },
+    {
+      "presetName": "Floating Arm Whipper (NASAW)",
+      "baselineRange": 4225.052173898977,
+      "perturbationSize": 0.01,
+      "numPerturbations": 5,
+      "avgMaxDivergence": 0.2777002465785877,
+      "avgFinalDivergence": 0.26877343476987886,
+      "avgGrowthRate": 0.0709648894788725,
+      "avgDoublingTime": 24.080000000000002,
+      "avgRangeDifference": 2.355199584964976,
+      "baselineTrajectoryLength": 186,
+      "individualResults": [
+        {
+          "initialDivergence": 0.016610528992274283,
+          "maxDivergence": 0.2654554496779121,
+          "finalDivergence": 0.2654554496779121,
+          "avgDivergence": 0.057472170743863134,
+          "growthRate": 0.07490297994167414,
+          "doubling_time": 25.8,
+          "trajectoryLength": 186,
+          "finalVelocityDivergence": 0.3610110789754171,
+          "rangeDifference": 2.2863307368324968
+        },
+        {
+          "initialDivergence": 0.018409348049142776,
+          "maxDivergence": 0.45172112199558545,
+          "finalDivergence": 0.4358251663068679,
+          "avgDivergence": 0.09361686282311976,
+          "growthRate": 0.0855238536883212,
+          "doubling_time": 22.400000000000002,
+          "trajectoryLength": 186,
+          "finalVelocityDivergence": 0.48020435328452477,
+          "rangeDifference": 3.0339313817503353
+        },
+        {
+          "initialDivergence": 0.013088512074356639,
+          "maxDivergence": 0.36869922309238445,
+          "finalDivergence": 0.35728141401076396,
+          "avgDivergence": 0.06853211626612178,
+          "growthRate": 0.08937267138415407,
+          "doubling_time": 19.6,
+          "trajectoryLength": 186,
+          "finalVelocityDivergence": 0.21271997073316964,
+          "rangeDifference": 3.1589595544701297
+        },
+        {
+          "initialDivergence": 0.020263775266171114,
+          "maxDivergence": 0.12572567393367087,
+          "finalDivergence": 0.10994435658567146,
+          "avgDivergence": 0.047032384686869814,
+          "growthRate": 0.045706474763458994,
+          "doubling_time": 25.8,
+          "trajectoryLength": 186,
+          "finalVelocityDivergence": 0.18185780245396987,
+          "rangeDifference": 2.116558279788478
+        },
+        {
+          "initialDivergence": 0.019532157138895414,
+          "maxDivergence": 0.17689976419338557,
+          "finalDivergence": 0.1753607872681789,
+          "avgDivergence": 0.03960827096776054,
+          "growthRate": 0.059318467616754085,
+          "doubling_time": 26.8,
+          "trajectoryLength": 186,
+          "finalVelocityDivergence": 0.09714792047910495,
+          "rangeDifference": 1.1802179719834385
+        }
+      ]
+    },
+    {
+      "presetName": "Whipper",
+      "baselineRange": 1851.6048387589794,
+      "perturbationSize": 0.01,
+      "numPerturbations": 5,
+      "avgMaxDivergence": 1.7253894417694806,
+      "avgFinalDivergence": 1.2146376734419682,
+      "avgGrowthRate": 0.06329787581585752,
+      "avgDoublingTime": 20.699999999999996,
+      "avgRangeDifference": 1.0634751195160788,
+      "baselineTrajectoryLength": 201,
+      "individualResults": [
+        {
+          "initialDivergence": 0.01927745312053141,
+          "maxDivergence": 1.8767098342241721,
+          "finalDivergence": 1.8767098342241721,
+          "avgDivergence": 0.298436563817206,
+          "growthRate": 0.07630565422588308,
+          "doubling_time": 29.099999999999998,
+          "trajectoryLength": 201,
+          "finalVelocityDivergence": 1.1087257531913854,
+          "rangeDifference": 1.2577372732166623
+        },
+        {
+          "initialDivergence": 0.01916057329155264,
+          "maxDivergence": 1.949869240487563,
+          "finalDivergence": 0.19474727344578305,
+          "avgDivergence": 0.446847033989369,
+          "growthRate": 0.038647466516806055,
+          "doubling_time": 11.1,
+          "trajectoryLength": 201,
+          "finalVelocityDivergence": 0.14027546709781974,
+          "rangeDifference": 1.580550864875704
+        },
+        {
+          "initialDivergence": 0.017693753744413836,
+          "maxDivergence": 2.0867537222272223,
+          "finalDivergence": 2.0867537222272223,
+          "avgDivergence": 0.2734142053260738,
+          "growthRate": 0.07950255354952336,
+          "doubling_time": 31.2,
+          "trajectoryLength": 201,
+          "finalVelocityDivergence": 1.3317922337667247,
+          "rangeDifference": 0.11537781987954077
+        },
+        {
+          "initialDivergence": 0.019234053381422624,
+          "maxDivergence": 1.576935438404983,
+          "finalDivergence": 1.576935438404983,
+          "avgDivergence": 0.352497167434097,
+          "growthRate": 0.0734426054161435,
+          "doubling_time": 16.5,
+          "trajectoryLength": 201,
+          "finalVelocityDivergence": 0.947559428790803,
+          "rangeDifference": 0.3397031207471173
+        },
+        {
+          "initialDivergence": 0.01831470846820829,
+          "maxDivergence": 1.136678973503462,
+          "finalDivergence": 0.33804209890768133,
+          "avgDivergence": 0.285681778015616,
+          "growthRate": 0.04859109937093167,
+          "doubling_time": 15.6,
+          "trajectoryLength": 201,
+          "finalVelocityDivergence": 0.23717396431421417,
+          "rangeDifference": 2.02400651886137
+        }
+      ]
+    },
+    {
+      "presetName": "Fiffer",
+      "baselineRange": 4226.111901920669,
+      "perturbationSize": 0.01,
+      "numPerturbations": 5,
+      "avgMaxDivergence": 0.2914717686621141,
+      "avgFinalDivergence": 0.2886747914646957,
+      "avgGrowthRate": 0.12187621123641798,
+      "avgDoublingTime": 15.84,
+      "avgRangeDifference": 1.3710852913767666,
+      "baselineTrajectoryLength": 101,
+      "individualResults": [
+        {
+          "initialDivergence": 0.027411486862487795,
+          "maxDivergence": 0.3155571937916765,
+          "finalDivergence": 0.3155571937916765,
+          "avgDivergence": 0.06173697254074294,
+          "growthRate": 0.12216888956493317,
+          "doubling_time": 16.400000000000002,
+          "trajectoryLength": 101,
+          "finalVelocityDivergence": 0.5264656118767022,
+          "rangeDifference": 1.6757976802555277
+        },
+        {
+          "initialDivergence": 0.02571129302481749,
+          "maxDivergence": 0.339034902539072,
+          "finalDivergence": 0.339034902539072,
+          "avgDivergence": 0.05754927136279747,
+          "growthRate": 0.12895863733646834,
+          "doubling_time": 17.2,
+          "trajectoryLength": 101,
+          "finalVelocityDivergence": 0.5528472339943377,
+          "rangeDifference": 1.255685267003173
+        },
+        {
+          "initialDivergence": 0.02215618267060685,
+          "maxDivergence": 0.29719857539524785,
+          "finalDivergence": 0.29719857539524785,
+          "avgDivergence": 0.05230576661954804,
+          "growthRate": 0.12981419672637443,
+          "doubling_time": 16.8,
+          "trajectoryLength": 101,
+          "finalVelocityDivergence": 0.4660254437905195,
+          "rangeDifference": 1.2180854455209555
+        },
+        {
+          "initialDivergence": 0.02425553279151587,
+          "maxDivergence": 0.1812679071897945,
+          "finalDivergence": 0.16728302120270266,
+          "avgDivergence": 0.059201744284370784,
+          "growthRate": 0.09655211839994854,
+          "doubling_time": 12.4,
+          "trajectoryLength": 101,
+          "finalVelocityDivergence": 0.2332645940833873,
+          "rangeDifference": 1.6066365745373332
+        },
+        {
+          "initialDivergence": 0.02319474038678348,
+          "maxDivergence": 0.3243002643947795,
+          "finalDivergence": 0.3243002643947795,
+          "avgDivergence": 0.05601353034071065,
+          "growthRate": 0.1318872141543655,
+          "doubling_time": 16.400000000000002,
+          "trajectoryLength": 101,
+          "finalVelocityDivergence": 0.4828797979010196,
+          "rangeDifference": 1.099221489566844
+        }
+      ]
+    },
+    {
+      "presetName": "Floating Arm King Arthur",
+      "baselineRange": 3469.5571644464712,
+      "perturbationSize": 0.01,
+      "numPerturbations": 5,
+      "avgMaxDivergence": 0.7679095668803445,
+      "avgFinalDivergence": 0.6856805605117197,
+      "avgGrowthRate": 0.08545330095798834,
+      "avgDoublingTime": 25.04,
+      "avgRangeDifference": 1.4518020131008598,
+      "baselineTrajectoryLength": 200,
+      "individualResults": [
+        {
+          "initialDivergence": 0.021181875486577087,
+          "maxDivergence": 1.8408690083988146,
+          "finalDivergence": 1.5430245076570008,
+          "avgDivergence": 0.333981237412969,
+          "growthRate": 0.10774758415126412,
+          "doubling_time": 16.400000000000002,
+          "trajectoryLength": 200,
+          "finalVelocityDivergence": 2.6429599051892545,
+          "rangeDifference": 3.735304632736643
+        },
+        {
+          "initialDivergence": 0.01270523176178456,
+          "maxDivergence": 0.93903675698959,
+          "finalDivergence": 0.8333230023483521,
+          "avgDivergence": 0.16536777534315644,
+          "growthRate": 0.10511074036547735,
+          "doubling_time": 17,
+          "trajectoryLength": 200,
+          "finalVelocityDivergence": 1.4229339787896575,
+          "rangeDifference": 0.7307784029662798
+        },
+        {
+          "initialDivergence": 0.017172422754864167,
+          "maxDivergence": 0.5018962372081417,
+          "finalDivergence": 0.5018962372081417,
+          "avgDivergence": 0.09303351295597938,
+          "growthRate": 0.0848012218751353,
+          "doubling_time": 27.6,
+          "trajectoryLength": 200,
+          "finalVelocityDivergence": 0.7698418938779803,
+          "rangeDifference": 0.7329227148316022
+        },
+        {
+          "initialDivergence": 0.01607568030638237,
+          "maxDivergence": 0.11048895185118786,
+          "finalDivergence": 0.10290217539111482,
+          "avgDivergence": 0.025136601783127484,
+          "growthRate": 0.04664500486043287,
+          "doubling_time": 33.4,
+          "trajectoryLength": 200,
+          "finalVelocityDivergence": 0.16416907486888035,
+          "rangeDifference": 0.4173028269897259
+        },
+        {
+          "initialDivergence": 0.01646517186976265,
+          "maxDivergence": 0.4472568799539886,
+          "finalDivergence": 0.4472568799539886,
+          "avgDivergence": 0.06481880301663988,
+          "growthRate": 0.08296195353763208,
+          "doubling_time": 30.8,
+          "trajectoryLength": 200,
+          "finalVelocityDivergence": 0.4021142529958431,
+          "rangeDifference": 1.6427014879800481
+        }
+      ]
+    },
+    {
+      "presetName": "Launch Ness Monster",
+      "baselineRange": 873.0920743872206,
+      "perturbationSize": 0.01,
+      "numPerturbations": 5,
+      "avgMaxDivergence": 4.546094926072175,
+      "avgFinalDivergence": 2.8687781352723016,
+      "avgGrowthRate": 0.056806844820740145,
+      "avgDoublingTime": 29.28,
+      "avgRangeDifference": 5.433930527494567,
+      "baselineTrajectoryLength": 267,
+      "individualResults": [
+        {
+          "initialDivergence": 0.01976661234899594,
+          "maxDivergence": 4.2779145816911,
+          "finalDivergence": 3.046342812744244,
+          "avgDivergence": 0.8990383464897382,
+          "growthRate": 0.0631291078064511,
+          "doubling_time": 25.2,
+          "trajectoryLength": 267,
+          "finalVelocityDivergence": 2.93932953908482,
+          "rangeDifference": 5.915628991641597
+        },
+        {
+          "initialDivergence": 0.021669062753527205,
+          "maxDivergence": 1.418652047374823,
+          "finalDivergence": 0.7798615154440823,
+          "avgDivergence": 0.28156689630896936,
+          "growthRate": 0.044902641552392666,
+          "doubling_time": 33,
+          "trajectoryLength": 267,
+          "finalVelocityDivergence": 0.7167082864465558,
+          "rangeDifference": 2.2920285518518995
+        },
+        {
+          "initialDivergence": 0.02391147227732659,
+          "maxDivergence": 0.9859663300771488,
+          "finalDivergence": 0.7044963409965108,
+          "avgDivergence": 0.16198046249115608,
+          "growthRate": 0.04239504739590837,
+          "doubling_time": 45.9,
+          "trajectoryLength": 267,
+          "finalVelocityDivergence": 0.4989279840116749,
+          "rangeDifference": 1.2142849074928108
+        },
+        {
+          "initialDivergence": 0.022720930551298178,
+          "maxDivergence": 5.422382734692083,
+          "finalDivergence": 3.568077474187644,
+          "avgDivergence": 1.1185510999749182,
+          "growthRate": 0.06336460722686817,
+          "doubling_time": 23.7,
+          "trajectoryLength": 267,
+          "finalVelocityDivergence": 3.4528063977572807,
+          "rangeDifference": 7.456297229270149
+        },
+        {
+          "initialDivergence": 0.02296973308207228,
+          "maxDivergence": 10.625558936525717,
+          "finalDivergence": 6.245112532989027,
+          "avgDivergence": 2.1369641117567846,
+          "growthRate": 0.07024282012208044,
+          "doubling_time": 18.599999999999998,
+          "trajectoryLength": 267,
+          "finalVelocityDivergence": 6.08700288048663,
+          "rangeDifference": 10.29141295721638
+        }
+      ]
+    },
+    {
+      "presetName": "Pulley Sling",
+      "baselineRange": 6298.281270257098,
+      "perturbationSize": 0.01,
+      "numPerturbations": 5,
+      "avgMaxDivergence": 0.22958568121323958,
+      "avgFinalDivergence": 0.13676887893536022,
+      "avgGrowthRate": 0.049828657590677866,
+      "avgDoublingTime": 17.560000000000002,
+      "avgRangeDifference": 0.16920121012644812,
+      "baselineTrajectoryLength": 176,
+      "individualResults": [
+        {
+          "initialDivergence": 0.01848392234819693,
+          "maxDivergence": 0.20499906687219965,
+          "finalDivergence": 0.07222845725076495,
+          "avgDivergence": 0.05742171180275775,
+          "growthRate": 0.03894093774344192,
+          "doubling_time": 13,
+          "trajectoryLength": 176,
+          "finalVelocityDivergence": 0.060292637586939354,
+          "rangeDifference": 0.34674513351001224
+        },
+        {
+          "initialDivergence": 0.022037817621173607,
+          "maxDivergence": 0.23607151142426058,
+          "finalDivergence": 0.12724537328561386,
+          "avgDivergence": 0.07615287435520647,
+          "growthRate": 0.05009592386120024,
+          "doubling_time": 14.600000000000001,
+          "trajectoryLength": 176,
+          "finalVelocityDivergence": 0.08498033939344492,
+          "rangeDifference": 0.040388340073150175
+        },
+        {
+          "initialDivergence": 0.01901031660679673,
+          "maxDivergence": 0.06945106048474957,
+          "finalDivergence": 0.05922272470221427,
+          "avgDivergence": 0.028208781021947616,
+          "growthRate": 0.03246638629527989,
+          "doubling_time": 25,
+          "trajectoryLength": 176,
+          "finalVelocityDivergence": 0.04073418082413844,
+          "rangeDifference": 0.15734664132742182
+        },
+        {
+          "initialDivergence": 0.019735216317327334,
+          "maxDivergence": 0.2530827495090567,
+          "finalDivergence": 0.1209538137437023,
+          "avgDivergence": 0.07581544319398222,
+          "growthRate": 0.05180011708502297,
+          "doubling_time": 17.6,
+          "trajectoryLength": 176,
+          "finalVelocityDivergence": 0.022705165679714142,
+          "rangeDifference": 0.06416569397697458
+        },
+        {
+          "initialDivergence": 0.02139737896673399,
+          "maxDivergence": 0.3843240177759313,
+          "finalDivergence": 0.30419402569450565,
+          "avgDivergence": 0.08743418495936256,
+          "growthRate": 0.0758399229684443,
+          "doubling_time": 17.6,
+          "trajectoryLength": 176,
+          "finalVelocityDivergence": 0.22226554372457086,
+          "rangeDifference": 0.23736024174468184
+        }
+      ]
+    },
+    {
+      "presetName": "MURLIN",
+      "baselineRange": 2636.129019828103,
+      "perturbationSize": 0.01,
+      "numPerturbations": 5,
+      "avgMaxDivergence": 33.2944107755037,
+      "avgFinalDivergence": 30.338758921049795,
+      "avgGrowthRate": 0.17015948951126486,
+      "avgDoublingTime": 15.9,
+      "avgRangeDifference": 11.38837760277056,
+      "baselineTrajectoryLength": 400,
+      "individualResults": [
+        {
+          "initialDivergence": 0.024100552593132013,
+          "maxDivergence": 30.71445480653524,
+          "finalDivergence": 27.439293877015658,
+          "avgDivergence": 2.1656307570033637,
+          "growthRate": 0.17637836036978596,
+          "doubling_time": 16.6,
+          "trajectoryLength": 400,
+          "finalVelocityDivergence": 18.165242772636862,
+          "rangeDifference": 15.067636243618836
+        },
+        {
+          "initialDivergence": 0.024227224931080718,
+          "maxDivergence": 18.891964772071645,
+          "finalDivergence": 17.067495531656597,
+          "avgDivergence": 1.3494199568828051,
+          "growthRate": 0.1643472202884346,
+          "doubling_time": 17.7,
+          "trajectoryLength": 400,
+          "finalVelocityDivergence": 11.090221211778696,
+          "rangeDifference": 6.789575472398155
+        },
+        {
+          "initialDivergence": 0.021983065751617376,
+          "maxDivergence": 4.128184040651138,
+          "finalDivergence": 3.7776791534561527,
+          "avgDivergence": 0.391905458008856,
+          "growthRate": 0.1289872857415687,
+          "doubling_time": 17.8,
+          "trajectoryLength": 400,
+          "finalVelocityDivergence": 3.0835698564864567,
+          "rangeDifference": 4.36053657513412
+        },
+        {
+          "initialDivergence": 0.026695639482135318,
+          "maxDivergence": 58.66371577121554,
+          "finalDivergence": 55.95457763943649,
+          "avgDivergence": 3.722800265126423,
+          "growthRate": 0.19167406742386478,
+          "doubling_time": 16,
+          "trajectoryLength": 400,
+          "finalVelocityDivergence": 41.32362712147511,
+          "rangeDifference": 19.863068047417073
+        },
+        {
+          "initialDivergence": 0.024780384009434737,
+          "maxDivergence": 54.07373448704493,
+          "finalDivergence": 47.45474840368407,
+          "avgDivergence": 3.95355363334264,
+          "growthRate": 0.18941051373267026,
+          "doubling_time": 11.4,
+          "trajectoryLength": 400,
+          "finalVelocityDivergence": 30.68894370469193,
+          "rangeDifference": 10.86107167528462
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "championPerformanceRank": 1,
+    "championSensitivityRank": 6,
+    "totalDesigns": 12,
+    "correlation": -0.011274818739912372,
+    "improvementVsBestPreset": 219.07164888887976,
+    "sensitivityVsMostSensitive": -63.62589569644342,
+    "sensitivityVsLeastSensitive": 70.09583564196133
+  }
+}
