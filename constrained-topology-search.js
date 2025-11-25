@@ -119,6 +119,53 @@ export function evaluateConstrainedTopology(config, maxForce = 15000) {
 }
 
 /**
+ * Update mainaxle to be the highest particle with a pin or slider constraint
+ * This ensures mainaxle has the semantic meaning expected by range calculation
+ */
+function updateMainaxleToHighest(config) {
+  // Find all particles with pins or sliders
+  const particlesWithConstraints = new Set();
+
+  if (config.constraints.pin) {
+    for (const pin of config.constraints.pin) {
+      particlesWithConstraints.add(pin.p);
+    }
+  }
+
+  if (config.constraints.slider) {
+    for (const slider of config.constraints.slider) {
+      particlesWithConstraints.add(slider.p);
+    }
+  }
+
+  // If no particles have pins/sliders, default to particle 0
+  if (particlesWithConstraints.size === 0) {
+    config.mainaxle = 0;
+    return config;
+  }
+
+  // Find the highest particle (maximum Y value) among those with constraints
+  let highestParticle = -1;
+  let highestY = -Infinity;
+
+  for (const particleIdx of particlesWithConstraints) {
+    if (particleIdx < config.particles.length) {
+      const y = config.particles[particleIdx].y;
+      if (y > highestY) {
+        highestY = y;
+        highestParticle = particleIdx;
+      }
+    }
+  }
+
+  if (highestParticle !== -1) {
+    config.mainaxle = highestParticle;
+  }
+
+  return config;
+}
+
+/**
  * Mutation operators with minimum mass constraint
  */
 
@@ -290,6 +337,9 @@ export function mutateTopology(config, rng, mutationRate = 0.3, minMass = 1) {
     }
   }
 
+  // Update mainaxle to highest particle with pin/slider
+  config = updateMainaxleToHighest(config);
+
   return config;
 }
 
@@ -358,7 +408,7 @@ export function createInitialPopulation(size, seed = 12345, minMass = 1) {
       });
     }
 
-    population.push({
+    let config = {
       projectile,
       mainaxle,
       armtip,
@@ -367,7 +417,12 @@ export function createInitialPopulation(size, seed = 12345, minMass = 1) {
       duration: 35,
       particles,
       constraints,
-    });
+    };
+
+    // Update mainaxle to highest particle with pin/slider
+    config = updateMainaxleToHighest(config);
+
+    population.push(config);
   }
 
   return population;
