@@ -34,6 +34,13 @@ function calculateEnergy(state, masses) {
  */
 export function evaluateConstrainedTopology(config, maxForce = 15000) {
   try {
+    // Validate no negative masses
+    for (const particle of config.particles) {
+      if (particle.mass < 0) {
+        return { fitness: 0, range: 0, valid: false, reason: "negative_mass" };
+      }
+    }
+
     fillEmptyConstraints(config);
 
     function terminate(trajectories) {
