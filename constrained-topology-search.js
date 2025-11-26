@@ -107,6 +107,51 @@ export function evaluateConstrainedTopology(config, maxForce = 15000) {
       };
     }
 
+    // Check effective height constraint (prevents scale factor exploit)
+    // Calculate effective height from trajectories
+    const numParticles = config.particles.length;
+    let axlecoord = -config.particles[config.mainaxle].y;
+    let mincoord = -config.particles[config.mainaxle].y;
+
+    for (const trajectory of trajectories) {
+      for (let partIndex = 0; partIndex < numParticles; partIndex++) {
+        if (trajectory[2 * partIndex] < 2000) {
+          mincoord = Math.min(mincoord, -trajectory[2 * partIndex + 1]);
+        }
+      }
+      axlecoord = Math.max(axlecoord, -trajectory[2 * config.mainaxle + 1]);
+    }
+
+    const effectiveHeight = axlecoord - mincoord;
+
+    // Calculate longest rod length
+    let longestRodLength = 0;
+    if (config.constraints.rod) {
+      for (const rod of config.constraints.rod) {
+        const p1 = config.particles[rod.p1];
+        const p2 = config.particles[rod.p2];
+        const dx = p1.x - p2.x;
+        const dy = p1.y - p2.y;
+        const length = Math.sqrt(dx * dx + dy * dy);
+        longestRodLength = Math.max(longestRodLength, length);
+      }
+    }
+
+    // Minimum effective height = half the longest rod
+    const minEffectiveHeight = longestRodLength / 2;
+
+    if (effectiveHeight < minEffectiveHeight) {
+      return {
+        fitness: 0,
+        range: range,
+        peakLoad: peakLoad,
+        effectiveHeight: effectiveHeight,
+        minEffectiveHeight: minEffectiveHeight,
+        valid: false,
+        reason: "machine_too_thin",
+      };
+    }
+
     // All constraints satisfied!
     return {
       fitness: range,
@@ -114,6 +159,8 @@ export function evaluateConstrainedTopology(config, maxForce = 15000) {
       peakLoad: peakLoad,
       valid: true,
       energyConserved: true,
+      effectiveHeight: effectiveHeight,
+      minEffectiveHeight: minEffectiveHeight,
       numParticles: config.particles.length,
       numConstraints:
         (config.constraints.rod?.length || 0) +
