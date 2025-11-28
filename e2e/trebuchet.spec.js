@@ -116,4 +116,51 @@ test.describe('Trebuchet Designer', () => {
     // Verify that optimization achieved at least 600 ft range
     expect(finalRange).toBeGreaterThanOrEqual(600);
   });
+
+  test('should toggle gentlify button and reduce peak load', async ({ page }) => {
+    await page.goto('/');
+
+    // Wait for the application to load
+    await page.waitForTimeout(1000);
+
+    // Get initial values
+    const initialRangeText = await page.locator('#range').textContent();
+    const initialRange = parseFloat(initialRangeText);
+    const initialPeakLoadText = await page.locator('#peakLoad').textContent();
+    const initialPeakLoad = parseFloat(initialPeakLoadText);
+
+    // Get the gentlify button by ID (text will change, so use stable selector)
+    const gentlifyButton = page.locator('#gentlify');
+    await expect(gentlifyButton).toBeVisible();
+    await expect(gentlifyButton).toHaveText('Gentlify');
+
+    // Click the gentlify button to start optimization
+    await gentlifyButton.click();
+
+    // Verify button text changes to "Stop"
+    await expect(gentlifyButton).toHaveText('Stop');
+
+    // Wait for optimization to run for six seconds
+    await page.waitForTimeout(6000);
+
+    // Click the button again to stop optimization
+    await gentlifyButton.click();
+
+    // Verify button text changes back to "Gentlify"
+    await expect(gentlifyButton).toHaveText('Gentlify');
+
+    // Get final values
+    const finalRangeText = await page.locator('#range').textContent();
+    const finalRange = parseFloat(finalRangeText);
+    const finalPeakLoadText = await page.locator('#peakLoad').textContent();
+    const finalPeakLoad = parseFloat(finalPeakLoadText);
+
+    // Log the values for analysis
+    console.log(`Initial range: ${initialRange.toFixed(1)} ft, Final range: ${finalRange.toFixed(1)} ft`);
+    console.log(`Initial peak load: ${initialPeakLoad.toFixed(1)} lbf, Final peak load: ${finalPeakLoad.toFixed(1)} lbf`);
+
+    // Verify that gentlify maintained range and reduced peak load
+    expect(finalRange).toBeGreaterThanOrEqual(initialRange - 10); // Allow small variance
+    expect(finalPeakLoad).toBeLessThanOrEqual(450); // Peak load should be reduced significantly
+  });
 });
