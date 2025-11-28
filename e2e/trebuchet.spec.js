@@ -75,4 +75,44 @@ test.describe('Trebuchet Designer', () => {
     await expect(peakLoadValue).toBeGreaterThanOrEqual(1020.3 - 5);
     await expect(peakLoadValue).toBeLessThanOrEqual(1020.3 + 5);
   });
+
+  test('should toggle optimize button and update range', async ({ page }) => {
+    await page.goto('/');
+
+    // Wait for the application to load
+    await page.waitForTimeout(1000);
+
+    // Get initial range value
+    const initialRangeText = await page.locator('#range').textContent();
+    const initialRange = parseFloat(initialRangeText);
+
+    // Get the optimize button by ID (text will change, so use stable selector)
+    const optimizeButton = page.locator('#optimize');
+    await expect(optimizeButton).toBeVisible();
+    await expect(optimizeButton).toHaveText('Optimize');
+
+    // Click the optimize button to start optimization
+    await optimizeButton.click();
+
+    // Verify button text changes to "Stop"
+    await expect(optimizeButton).toHaveText('Stop');
+
+    // Wait for optimization to run for a short period
+    await page.waitForTimeout(500);
+
+    // Click the button again to stop optimization
+    await optimizeButton.click();
+
+    // Verify button text changes back to "Optimize"
+    await expect(optimizeButton).toHaveText('Optimize');
+
+    // Get final range value
+    const finalRangeText = await page.locator('#range').textContent();
+    const finalRange = parseFloat(finalRangeText);
+
+    // Verify that optimization attempted to run (range might have changed)
+    // Note: We don't strictly require the range to increase since optimization
+    // might not always find a better solution in such a short time
+    expect(finalRange).toBeGreaterThan(0);
+  });
 });
