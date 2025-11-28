@@ -97,8 +97,8 @@ test.describe('Trebuchet Designer', () => {
     // Verify button text changes to "Stop"
     await expect(optimizeButton).toHaveText('Stop');
 
-    // Wait for optimization to run for a short period
-    await page.waitForTimeout(500);
+    // Wait for optimization to run for six seconds
+    await page.waitForTimeout(6000);
 
     // Click the button again to stop optimization
     await optimizeButton.click();
