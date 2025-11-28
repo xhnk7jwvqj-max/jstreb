@@ -110,6 +110,9 @@ test.describe('Trebuchet Designer', () => {
     const finalRangeText = await page.locator('#range').textContent();
     const finalRange = parseFloat(finalRangeText);
 
+    // Log the range values for analysis
+    console.log(`Initial range: ${initialRange.toFixed(1)} ft, Final range: ${finalRange.toFixed(1)} ft`);
+
     // Verify that optimization attempted to run (range might have changed)
     // Note: We don't strictly require the range to increase since optimization
     // might not always find a better solution in such a short time
