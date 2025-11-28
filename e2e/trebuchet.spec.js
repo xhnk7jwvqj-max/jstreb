@@ -113,9 +113,7 @@ test.describe('Trebuchet Designer', () => {
     // Log the range values for analysis
     console.log(`Initial range: ${initialRange.toFixed(1)} ft, Final range: ${finalRange.toFixed(1)} ft`);
 
-    // Verify that optimization attempted to run (range might have changed)
-    // Note: We don't strictly require the range to increase since optimization
-    // might not always find a better solution in such a short time
-    expect(finalRange).toBeGreaterThan(0);
+    // Verify that optimization achieved at least 600 ft range
+    expect(finalRange).toBeGreaterThanOrEqual(600);
   });
 });
