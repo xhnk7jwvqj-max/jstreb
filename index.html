@@ -22,6 +22,18 @@
             <button id="load" onclick="load()">Load</button>
             <button id="save" onclick="save()">Save</button>
           </div>
+          <div class="firstRow">
+            <select id="optimizerSelect">
+              <option value="">Select Advanced Optimizer</option>
+              <option value="improved-cmaes">Improved CMA-ES</option>
+              <option value="differential-evolution">Differential Evolution</option>
+              <option value="particle-swarm">Particle Swarm</option>
+              <option value="simulated-annealing">Simulated Annealing</option>
+              <option value="nelder-mead">Nelder-Mead Simplex</option>
+              <option value="adaptive-momentum">Adaptive Momentum</option>
+            </select>
+            <button id="optimizeAdvanced" onclick="runSelectedOptimizer()">Optimize (Advanced)</button>
+          </div>
           <div class="headerRow">
             <label
               >Timestep

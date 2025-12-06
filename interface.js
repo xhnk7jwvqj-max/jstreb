@@ -6,6 +6,14 @@ import {
   presets,
 } from "./trebuchetsimulation.js";
 import { sampleGaussian, calculateMean, calculateCovariance, randn, choleskyDecomposition} from "./gaussian.js";
+import {
+  simulatedAnnealing,
+  differentialEvolution,
+  particleSwarm,
+  adaptiveMomentum,
+  nelderMead,
+  improvedCMAES
+} from "./optimizers.js";
 
 var ctypes = ["rod", "pin", "slider", "colinear", "f2k", "rope"];
 // Prevent scrolling when touching the canvas
@@ -1419,6 +1427,408 @@ function load() {
   input.click();
   document.body.removeChild(input);
 }
+// New optimizer wrapper functions
+let currentOptimizer = null;
+
+async function runSimulatedAnnealing() {
+  if (currentOptimizer) {
+    currentOptimizer = null;
+    document.getElementById("optimizeAdvanced").innerText = "Optimize (Advanced)";
+    return;
+  }
+  document.getElementById("optimizeAdvanced").innerText = "Stop";
+  currentOptimizer = true;
+
+  function pullconfig() {
+    var config = [];
+    for (var p of window.data.particles.slice(1)) {
+      if (p.x % 10 != 0) {
+        config.push(p.x);
+      }
+      if (p.y % 10 != 0) {
+        config.push(p.y);
+      }
+      if (p.mass % 1 != 0) {
+        config.push(p.mass);
+      }
+    }
+    return config;
+  }
+
+  function pushconfig(config) {
+    var i = 0;
+    for (var p of window.data.particles.slice(1)) {
+      if (p.x % 10 != 0) {
+        p.x = config[i];
+        i += 1;
+      }
+      if (p.y % 10 != 0) {
+        p.y = config[i];
+        i += 1;
+      }
+      if (p.mass % 1 != 0) {
+        p.mass = Math.abs(config[i]);
+        i += 1;
+      }
+    }
+  }
+
+  function objectiveFunc(config) {
+    pushconfig(config);
+    var [_, range, _, _load] = simulateAndRange();
+    return range;
+  }
+
+  await simulatedAnnealing(
+    pullconfig,
+    pushconfig,
+    objectiveFunc,
+    drawMechanism,
+    wait,
+    () => !currentOptimizer
+  );
+
+  currentOptimizer = null;
+  document.getElementById("optimizeAdvanced").innerText = "Optimize (Advanced)";
+}
+
+async function runDifferentialEvolution() {
+  if (currentOptimizer) {
+    currentOptimizer = null;
+    document.getElementById("optimizeAdvanced").innerText = "Optimize (Advanced)";
+    return;
+  }
+  document.getElementById("optimizeAdvanced").innerText = "Stop";
+  currentOptimizer = true;
+
+  function pullconfig() {
+    var config = [];
+    for (var p of window.data.particles.slice(1)) {
+      if (p.x % 10 != 0) {
+        config.push(p.x);
+      }
+      if (p.y % 10 != 0) {
+        config.push(p.y);
+      }
+      if (p.mass % 1 != 0) {
+        config.push(p.mass);
+      }
+    }
+    return config;
+  }
+
+  function pushconfig(config) {
+    var i = 0;
+    for (var p of window.data.particles.slice(1)) {
+      if (p.x % 10 != 0) {
+        p.x = config[i];
+        i += 1;
+      }
+      if (p.y % 10 != 0) {
+        p.y = config[i];
+        i += 1;
+      }
+      if (p.mass % 1 != 0) {
+        p.mass = Math.abs(config[i]);
+        i += 1;
+      }
+    }
+  }
+
+  function objectiveFunc(config) {
+    pushconfig(config);
+    var [_, range, _, _load] = simulateAndRange();
+    return range;
+  }
+
+  await differentialEvolution(
+    pullconfig,
+    pushconfig,
+    objectiveFunc,
+    drawMechanism,
+    wait,
+    () => !currentOptimizer
+  );
+
+  currentOptimizer = null;
+  document.getElementById("optimizeAdvanced").innerText = "Optimize (Advanced)";
+}
+
+async function runParticleSwarm() {
+  if (currentOptimizer) {
+    currentOptimizer = null;
+    document.getElementById("optimizeAdvanced").innerText = "Optimize (Advanced)";
+    return;
+  }
+  document.getElementById("optimizeAdvanced").innerText = "Stop";
+  currentOptimizer = true;
+
+  function pullconfig() {
+    var config = [];
+    for (var p of window.data.particles.slice(1)) {
+      if (p.x % 10 != 0) {
+        config.push(p.x);
+      }
+      if (p.y % 10 != 0) {
+        config.push(p.y);
+      }
+      if (p.mass % 1 != 0) {
+        config.push(p.mass);
+      }
+    }
+    return config;
+  }
+
+  function pushconfig(config) {
+    var i = 0;
+    for (var p of window.data.particles.slice(1)) {
+      if (p.x % 10 != 0) {
+        p.x = config[i];
+        i += 1;
+      }
+      if (p.y % 10 != 0) {
+        p.y = config[i];
+        i += 1;
+      }
+      if (p.mass % 1 != 0) {
+        p.mass = Math.abs(config[i]);
+        i += 1;
+      }
+    }
+  }
+
+  function objectiveFunc(config) {
+    pushconfig(config);
+    var [_, range, _, _load] = simulateAndRange();
+    return range;
+  }
+
+  await particleSwarm(
+    pullconfig,
+    pushconfig,
+    objectiveFunc,
+    drawMechanism,
+    wait,
+    () => !currentOptimizer
+  );
+
+  currentOptimizer = null;
+  document.getElementById("optimizeAdvanced").innerText = "Optimize (Advanced)";
+}
+
+async function runAdaptiveMomentum() {
+  if (currentOptimizer) {
+    currentOptimizer = null;
+    document.getElementById("optimizeAdvanced").innerText = "Optimize (Advanced)";
+    return;
+  }
+  document.getElementById("optimizeAdvanced").innerText = "Stop";
+  currentOptimizer = true;
+
+  function pullconfig() {
+    var config = [];
+    for (var p of window.data.particles.slice(1)) {
+      if (p.x % 10 != 0) {
+        config.push(p.x);
+      }
+      if (p.y % 10 != 0) {
+        config.push(p.y);
+      }
+      if (p.mass % 1 != 0) {
+        config.push(p.mass);
+      }
+    }
+    return config;
+  }
+
+  function pushconfig(config) {
+    var i = 0;
+    for (var p of window.data.particles.slice(1)) {
+      if (p.x % 10 != 0) {
+        p.x = config[i];
+        i += 1;
+      }
+      if (p.y % 10 != 0) {
+        p.y = config[i];
+        i += 1;
+      }
+      if (p.mass % 1 != 0) {
+        p.mass = Math.abs(config[i]);
+        i += 1;
+      }
+    }
+  }
+
+  function objectiveFunc(config) {
+    pushconfig(config);
+    var [_, range, _, _load] = simulateAndRange();
+    return range;
+  }
+
+  await adaptiveMomentum(
+    pullconfig,
+    pushconfig,
+    objectiveFunc,
+    drawMechanism,
+    wait,
+    () => !currentOptimizer
+  );
+
+  currentOptimizer = null;
+  document.getElementById("optimizeAdvanced").innerText = "Optimize (Advanced)";
+}
+
+async function runNelderMead() {
+  if (currentOptimizer) {
+    currentOptimizer = null;
+    document.getElementById("optimizeAdvanced").innerText = "Optimize (Advanced)";
+    return;
+  }
+  document.getElementById("optimizeAdvanced").innerText = "Stop";
+  currentOptimizer = true;
+
+  function pullconfig() {
+    var config = [];
+    for (var p of window.data.particles.slice(1)) {
+      if (p.x % 10 != 0) {
+        config.push(p.x);
+      }
+      if (p.y % 10 != 0) {
+        config.push(p.y);
+      }
+      if (p.mass % 1 != 0) {
+        config.push(p.mass);
+      }
+    }
+    return config;
+  }
+
+  function pushconfig(config) {
+    var i = 0;
+    for (var p of window.data.particles.slice(1)) {
+      if (p.x % 10 != 0) {
+        p.x = config[i];
+        i += 1;
+      }
+      if (p.y % 10 != 0) {
+        p.y = config[i];
+        i += 1;
+      }
+      if (p.mass % 1 != 0) {
+        p.mass = Math.abs(config[i]);
+        i += 1;
+      }
+    }
+  }
+
+  function objectiveFunc(config) {
+    pushconfig(config);
+    var [_, range, _, _load] = simulateAndRange();
+    return range;
+  }
+
+  await nelderMead(
+    pullconfig,
+    pushconfig,
+    objectiveFunc,
+    drawMechanism,
+    wait,
+    () => !currentOptimizer
+  );
+
+  currentOptimizer = null;
+  document.getElementById("optimizeAdvanced").innerText = "Optimize (Advanced)";
+}
+
+async function runImprovedCMAES() {
+  if (currentOptimizer) {
+    currentOptimizer = null;
+    document.getElementById("optimizeAdvanced").innerText = "Optimize (Advanced)";
+    return;
+  }
+  document.getElementById("optimizeAdvanced").innerText = "Stop";
+  currentOptimizer = true;
+
+  function pullconfig() {
+    var config = [];
+    for (var p of window.data.particles.slice(1)) {
+      if (p.x % 10 != 0) {
+        config.push(p.x);
+      }
+      if (p.y % 10 != 0) {
+        config.push(p.y);
+      }
+      if (p.mass % 1 != 0) {
+        config.push(p.mass);
+      }
+    }
+    return config;
+  }
+
+  function pushconfig(config) {
+    var i = 0;
+    for (var p of window.data.particles.slice(1)) {
+      if (p.x % 10 != 0) {
+        p.x = config[i];
+        i += 1;
+      }
+      if (p.y % 10 != 0) {
+        p.y = config[i];
+        i += 1;
+      }
+      if (p.mass % 1 != 0) {
+        p.mass = Math.abs(config[i]);
+        i += 1;
+      }
+    }
+  }
+
+  function objectiveFunc(config) {
+    pushconfig(config);
+    var [_, range, _, _load] = simulateAndRange();
+    return range;
+  }
+
+  await improvedCMAES(
+    pullconfig,
+    pushconfig,
+    objectiveFunc,
+    drawMechanism,
+    wait,
+    () => !currentOptimizer
+  );
+
+  currentOptimizer = null;
+  document.getElementById("optimizeAdvanced").innerText = "Optimize (Advanced)";
+}
+
+async function runSelectedOptimizer() {
+  const selectedAlgo = document.getElementById("optimizerSelect").value;
+
+  switch(selectedAlgo) {
+    case "simulated-annealing":
+      await runSimulatedAnnealing();
+      break;
+    case "differential-evolution":
+      await runDifferentialEvolution();
+      break;
+    case "particle-swarm":
+      await runParticleSwarm();
+      break;
+    case "adaptive-momentum":
+      await runAdaptiveMomentum();
+      break;
+    case "nelder-mead":
+      await runNelderMead();
+      break;
+    case "improved-cmaes":
+      await runImprovedCMAES();
+      break;
+    default:
+      alert("Please select an optimizer");
+  }
+}
+
 window.doAnimate = doAnimate;
 window.terminate = terminate;
 window.drawMechanism = drawMechanism;
@@ -1447,3 +1857,4 @@ window.addPulley = addPulley;
 window.removePulley = removePulley;
 window.waitForAnimationFrame = waitForAnimationFrame;
 window.doit = doit;
+window.runSelectedOptimizer = runSelectedOptimizer;
