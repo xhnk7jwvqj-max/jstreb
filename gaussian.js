@@ -104,3 +104,50 @@ const X = [
 
 // Run the test
 //testFitAndSampleGaussian(X);
+
+// Function to compute eigenvalues and eigenvectors using power iteration
+export function eigenDecomposition(matrix, numEigs = 2, maxIter = 100) {
+    const n = matrix.length;
+    const eigenvectors = [];
+    const eigenvalues = [];
+
+    // Make a copy of the matrix to deflate
+    let A = matrix.map(row => [...row]);
+
+    for (let e = 0; e < Math.min(numEigs, n); e++) {
+        // Initialize random vector
+        let v = Array(n).fill(0).map(() => Math.random() - 0.5);
+
+        // Normalize
+        let norm = Math.sqrt(v.reduce((sum, x) => sum + x * x, 0));
+        v = v.map(x => x / norm);
+
+        // Power iteration
+        for (let iter = 0; iter < maxIter; iter++) {
+            // v_new = A * v
+            const v_new = A.map(row =>
+                row.reduce((sum, aij, j) => sum + aij * v[j], 0)
+            );
+
+            // Normalize
+            norm = Math.sqrt(v_new.reduce((sum, x) => sum + x * x, 0));
+            v = v_new.map(x => x / norm);
+        }
+
+        // Compute eigenvalue: λ = v^T A v
+        const Av = A.map(row => row.reduce((sum, aij, j) => sum + aij * v[j], 0));
+        const lambda = v.reduce((sum, vi, i) => sum + vi * Av[i], 0);
+
+        eigenvectors.push(v);
+        eigenvalues.push(lambda);
+
+        // Deflate: A = A - λ * v * v^T
+        for (let i = 0; i < n; i++) {
+            for (let j = 0; j < n; j++) {
+                A[i][j] -= lambda * v[i] * v[j];
+            }
+        }
+    }
+
+    return { eigenvalues, eigenvectors };
+}

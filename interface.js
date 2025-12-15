@@ -5,7 +5,7 @@ import {
   calculateRange,
   presets,
 } from "./trebuchetsimulation.js";
-import { sampleGaussian, calculateMean, calculateCovariance, randn, choleskyDecomposition} from "./gaussian.js";
+import { sampleGaussian, calculateMean, calculateCovariance, randn, choleskyDecomposition, eigenDecomposition} from "./gaussian.js";
 
 var ctypes = ["rod", "pin", "slider", "colinear", "f2k", "rope"];
 // Prevent scrolling when touching the canvas
@@ -1163,6 +1163,17 @@ async function optimizeRange2() {
     z = topz[0][1]
   }
   pushconfig(z);
+
+  // Save final covariance and optimum for landscape plotting
+  if (topz.length >= population_size) {
+    var population = topz.slice(0, population_size).map((pair) => pair[1]);
+    var mean = calculateMean(population);
+    var covariance = calculateCovariance(population, mean);
+    window.optimumConfig = z;
+    window.optimumCovariance = covariance;
+    console.log("Optimization complete. Final covariance saved.");
+  }
+
   drawMechanism();
 }
 let optimizingRange = false;
@@ -1419,6 +1430,188 @@ function load() {
   input.click();
   document.body.removeChild(input);
 }
+// Function to plot objective landscape along principal covariance directions
+function plotObjectiveLandscape() {
+  if (!window.optimumConfig || !window.optimumCovariance) {
+    alert("Please run the optimizer first to generate covariance data!");
+    return;
+  }
+
+  console.log("Computing eigendecomposition...");
+  const { eigenvalues, eigenvectors } = eigenDecomposition(window.optimumCovariance, 2);
+  console.log("Eigenvalues:", eigenvalues);
+
+  // Scale by 3x the standard deviations (sqrt of eigenvalues)
+  const scale1 = 3 * Math.sqrt(Math.abs(eigenvalues[0]));
+  const scale2 = 3 * Math.sqrt(Math.abs(eigenvalues[1]));
+
+  console.log("Scales:", scale1, scale2);
+
+  // Create grid
+  const gridSize = 20;
+  const t1_values = [];
+  const t2_values = [];
+  for (let i = 0; i < gridSize; i++) {
+    t1_values.push(-1 + (2 * i) / (gridSize - 1));
+    t2_values.push(-1 + (2 * i) / (gridSize - 1));
+  }
+
+  // Evaluate objective function on grid
+  const objectiveValues = [];
+  const t1_grid = [];
+  const t2_grid = [];
+
+  function pullconfig() {
+    var config = []
+    for (var p of window.data.particles.slice(1)) {
+      if (p.x % 10 != 0) {
+        config.push(p.x)
+      }
+      if (p.y % 10 != 0) {
+        config.push(p.y)
+      }
+      if (p.mass % 1 != 0) {
+        config.push(p.mass)
+      }
+    }
+    return config
+  }
+
+  function pushconfig(config) {
+    var i = 0;
+    for (var p of window.data.particles.slice(1)) {
+      if (p.x % 10 != 0) {
+        p.x = config[i]
+        i += 1;
+      }
+      if (p.y % 10 != 0) {
+        p.y = config[i]
+        i += 1
+      }
+      if (p.mass % 1 != 0) {
+        p.mass = Math.abs(config[i])
+        i += 1
+      }
+    }
+    return config
+  }
+
+  console.log("Evaluating objective on grid...");
+  for (let i = 0; i < gridSize; i++) {
+    for (let j = 0; j < gridSize; j++) {
+      const t1 = t1_values[i];
+      const t2 = t2_values[j];
+
+      // Compute config = optimum + t1 * scale1 * v1 + t2 * scale2 * v2
+      const config = window.optimumConfig.map((x, k) =>
+        x + t1 * scale1 * eigenvectors[0][k] + t2 * scale2 * eigenvectors[1][k]
+      );
+
+      pushconfig(config);
+      const simResult = simulateAndRange();
+      const range = simResult[1];
+
+      objectiveValues.push(range);
+      t1_grid.push(t1);
+      t2_grid.push(t2);
+    }
+  }
+
+  // Restore optimum
+  pushconfig(window.optimumConfig);
+  drawMechanism();
+
+  console.log("Creating plot...");
+  // Create heatmap data
+  const plotContainer = document.getElementById('plotContainer');
+  plotContainer.style.display = 'block';
+
+  const ctx = document.getElementById('myChart').getContext('2d');
+
+  // Destroy existing chart if any
+  if (window.landscapeChart) {
+    window.landscapeChart.destroy();
+  }
+
+  // Prepare data for scatter plot with colors
+  const minObj = Math.min(...objectiveValues);
+  const maxObj = Math.max(...objectiveValues);
+
+  const scatterData = objectiveValues.map((val, idx) => {
+    const normalized = (val - minObj) / (maxObj - minObj);
+    const r = Math.floor(255 * (1 - normalized));
+    const g = Math.floor(255 * normalized);
+    const color = `rgb(${r}, ${g}, 0)`;
+
+    return {
+      x: t1_grid[idx] * scale1,
+      y: t2_grid[idx] * scale2,
+      value: val,
+      color: color
+    };
+  });
+
+  window.landscapeChart = new Chart(ctx, {
+    type: 'scatter',
+    data: {
+      datasets: [{
+        label: 'Objective Landscape',
+        data: scatterData,
+        backgroundColor: scatterData.map(d => d.color),
+        pointRadius: 8,
+        pointStyle: 'rect'
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: `Objective Function Landscape (Range: ${minObj.toFixed(1)} - ${maxObj.toFixed(1)} ft)`
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              const point = scatterData[context.dataIndex];
+              return `Range: ${point.value.toFixed(2)} ft`;
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          type: 'linear',
+          position: 'bottom',
+          title: {
+            display: true,
+            text: `Principal Direction 1 (eigenvalue: ${eigenvalues[0].toFixed(2)})`
+          }
+        },
+        y: {
+          title: {
+            display: true,
+            text: `Principal Direction 2 (eigenvalue: ${eigenvalues[1].toFixed(2)})`
+          }
+        }
+      }
+    }
+  });
+
+  console.log("Plot complete!");
+
+  // Save data for external plotting
+  window.landscapePlotData = {
+    eigenvalues: eigenvalues,
+    t1_grid: t1_grid,
+    t2_grid: t2_grid,
+    objectiveValues: objectiveValues,
+    scale1: scale1,
+    scale2: scale2,
+    minObj: minObj,
+    maxObj: maxObj
+  };
+}
+
 window.doAnimate = doAnimate;
 window.terminate = terminate;
 window.drawMechanism = drawMechanism;
@@ -1439,6 +1632,7 @@ window.saveMechanism = saveMechanism;
 window.loadMechanism = loadMechanism;
 window.optimize = gentlify;
 window.optimizeRange = optimizeRange2;
+window.plotObjectiveLandscape = plotObjectiveLandscape;
 window.save = save;
 window.load = load;
 window.updatePulley = updatePulley;
