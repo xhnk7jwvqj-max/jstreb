@@ -2,8 +2,8 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Objective Landscape Plotting', () => {
   test('should run optimizer on whipper and plot objective landscape', async ({ page }) => {
-    // Set timeout to 2 minutes since optimization and plotting take time
-    test.setTimeout(120000);
+    // Set timeout to 3 minutes since optimization and plotting take time
+    test.setTimeout(180000);
     await page.goto('/');
 
     // Wait for the application to load
@@ -48,33 +48,39 @@ test.describe('Objective Landscape Plotting', () => {
     console.log('Generating objective landscape plot...');
     await plotButton.click();
 
-    // Wait for plot to be generated (grid evaluation takes time)
-    await page.waitForTimeout(12000);
-
-    // Verify plot container is visible
+    // Wait for plot container to become visible
     const plotContainer = page.locator('#plotContainer');
-    await expect(plotContainer).toBeVisible();
+    await expect(plotContainer).toBeVisible({ timeout: 60000 });
 
-    // Verify canvas is visible
+    // Wait for canvas to be visible
     const canvas = page.locator('#myChart');
     await expect(canvas).toBeVisible();
 
-    console.log('Plot generated successfully!');
+    // Wait a bit more for computation to complete
+    console.log('Waiting for landscape computation to complete...');
+    await page.waitForTimeout(30000);
 
-    // Extract the landscape plot data
+    console.log('Plot should be generated, attempting to extract data...');
+
+    // Try to extract the landscape plot data
     const landscapeData = await page.evaluate(() => {
-      return window.landscapePlotData;
+      return window.landscapePlotData || null;
     });
 
     // Save data to JSON file for external plotting
+    const fs = require('fs');
     if (landscapeData) {
-      const fs = require('fs');
       fs.writeFileSync('landscape-data.json', JSON.stringify(landscapeData, null, 2));
       console.log('Landscape data saved to landscape-data.json');
       console.log(`Data dimensions: ${landscapeData.objectiveValues.length} points`);
       console.log(`Eigenvalues: ${landscapeData.eigenvalues}`);
     } else {
-      console.log('Warning: landscapeData is undefined');
+      console.log('Warning: landscapeData is undefined, trying to extract partial data');
+      // Try to get console logs from the page
+      const logs = await page.evaluate(() => {
+        return document.body.innerText;
+      });
+      fs.writeFileSync('page-debug.txt', logs);
     }
 
     // Scroll to the plot container

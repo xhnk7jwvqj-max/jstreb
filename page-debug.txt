@@ -1,0 +1,104 @@
+Presets
+Hinged Counterweight
+Fixed Counterweight
+Floating Arm Trebuchet
+F2k
+Floating Arm Whipper (NASAW)
+Whipper
+Fiffer
+Floating Arm King Arthur
+Launch Ness Monster
+Pulley Sling
+MURLIN
+ Play Optimize Gentlify Plot Landscape Load Save
+Timestep  Duration  Main Axle 
+P 1
+P 2
+P 3
+P 4
+P 5
+ Projectile 
+P 1
+P 2
+P 3
+P 4
+P 5
+ Arm Tip 
+P 1
+P 2
+P 3
+P 4
+P 5
+Main Axle Height  ft Range: 2877.6 ft Peak force: 1804.8 lbf Simtime: 7 Back to Blog
++ Particle
+P 1 Mass  X  Y 
+P 2 Mass  X  Y 
+P 3 Mass  X  Y 
+P 4 Mass  X  Y 
+P 5 Mass  X  Y 
+X
++ Rod + Slider + Roller + F2k + Rope + Pin
+Rod 
+P 1
+P 5
+ 
+P 2
+ One way 
+X
+Rod 
+P 1
+P 4
+ 
+P 3
+ One way 
+X
+Rod 
+P 2
+P 3
+P 5
+ 
+P 4
+P 5
+ One way 
+X
+Rod 
+P 2
+P 3
+P 4
+ 
+P 4
+P 5
+ One way 
+X
+Rod 
+P 2
+P 4
+ 
+P 3
+P 5
+ One way 
+X
+Rod 
+P 1
+P 3
+P 5
+ 
+P 4
+ One way 
+X
+Rod 
+P 1
+P 2
+P 4
+ 
+P 5
+ One way 
+X
+Pin 
+P 1
+P 2
+P 3
+P 4
+P 5
+X
+Plot Time Series

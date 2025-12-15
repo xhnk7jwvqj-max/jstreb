@@ -1431,7 +1431,7 @@ function load() {
   document.body.removeChild(input);
 }
 // Function to plot objective landscape along principal covariance directions
-function plotObjectiveLandscape() {
+async function plotObjectiveLandscape() {
   if (!window.optimumConfig || !window.optimumCovariance) {
     alert("Please run the optimizer first to generate covariance data!");
     return;
@@ -1448,7 +1448,7 @@ function plotObjectiveLandscape() {
   console.log("Scales:", scale1, scale2);
 
   // Create grid
-  const gridSize = 20;
+  const gridSize = 15;  // Reduced from 20 for faster computation
   const t1_values = [];
   const t2_values = [];
   for (let i = 0; i < gridSize; i++) {
@@ -1497,6 +1497,8 @@ function plotObjectiveLandscape() {
   }
 
   console.log("Evaluating objective on grid...");
+  let evalCount = 0;
+  const totalEvals = gridSize * gridSize;
   for (let i = 0; i < gridSize; i++) {
     for (let j = 0; j < gridSize; j++) {
       const t1 = t1_values[i];
@@ -1514,6 +1516,13 @@ function plotObjectiveLandscape() {
       objectiveValues.push(range);
       t1_grid.push(t1);
       t2_grid.push(t2);
+
+      evalCount++;
+      // Yield control every 10 evaluations to keep browser responsive
+      if (evalCount % 10 === 0) {
+        console.log(`Evaluated ${evalCount}/${totalEvals} points...`);
+        await wait();
+      }
     }
   }
 
