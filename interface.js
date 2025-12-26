@@ -5,7 +5,7 @@ import {
   calculateRange,
   presets,
 } from "./trebuchetsimulation.js";
-import { sampleGaussian, calculateMean, calculateCovariance, randn, choleskyDecomposition} from "./gaussian.js";
+import { optimizeCMAES } from "./cmaes-optimizer.js";
 
 var ctypes = ["rod", "pin", "slider", "colinear", "f2k", "rope"];
 // Prevent scrolling when touching the canvas
@@ -1088,81 +1088,67 @@ async function optimizeRange2() {
   }
   document.getElementById("optimize").innerText = "Stop";
   optimizingRange2 = true;
-  //wait();
-  var step = .1;
-  var timer = 0;
+
+  // Extract optimizable parameters from particles
   function pullconfig() {
-	  var config = []
+    var config = []
     for (var p of window.data.particles.slice(1)) {
-        if (p.x % 10 != 0) {
-          config.push(p.x)
-        }
-        if (p.y % 10 != 0) {
-	  config.push(p.y)
-        }
-          if (p.mass % 1 != 0) {
-		  config.push(p.mass)
-          }
+      if (p.x % 10 != 0) {
+        config.push(p.x)
+      }
+      if (p.y % 10 != 0) {
+        config.push(p.y)
+      }
+      if (p.mass % 1 != 0) {
+        config.push(p.mass)
+      }
     }
     return config
   }
+
+  // Apply parameters back to particles
   function pushconfig(config) {
-	  var i = 0;
+    var i = 0;
     for (var p of window.data.particles.slice(1)) {
-        if (p.x % 10 != 0) {
-	  p.x = config[i]
-	  i += 1;
-        }
-        if (p.y % 10 != 0) {
-		p.y = config[i]
-		i += 1
-        }
-
-          if (p.mass % 1 != 0) {
-		  p.mass = Math.abs(config[i])
-		  i += 1
-          }
+      if (p.x % 10 != 0) {
+        p.x = config[i]
+        i += 1;
+      }
+      if (p.y % 10 != 0) {
+        p.y = config[i]
+        i += 1
+      }
+      if (p.mass % 1 != 0) {
+        p.mass = Math.abs(config[i])
+        i += 1
+      }
     }
-    return config
   }
-  var z = pullconfig()
-  function q(config) {
-	  pushconfig(config)
-          var [_, range, _, _oad] = simulateAndRange();
-	  return range
-  }
-  var topz = []
-  var newz;
 
-  var population_size = 25 * z.length
-  while (optimizingRange2) {
+  const initialConfig = pullconfig();
 
+  // Objective function: maximize range
+  const objectiveFunction = (config) => {
+    pushconfig(config);
+    var [_, range, _, _load] = simulateAndRange();
+    return range;
+  };
 
-    if (timer > population_size) {
-      topz = topz.slice(0, population_size)
-      var population = topz.map((pair) => pair[1])
-
-      var mean = calculateMean(population)
-      var covariance = calculateCovariance(population, mean)
-      //console.log(covariance)
-      var L = choleskyDecomposition(covariance)
-      newz = sampleGaussian(z, L)
-      //optimizingRange2 = false
-    } else {
-      newz = z.map((el) => el + randn() * step)
-    }
-    var zscore = q(newz)
-    timer += 1
-    topz.push([zscore, newz])
-    if (timer % 15 == 1 || zscore > topz[0][0]) {
-
+  // Run optimization
+  const bestConfig = await optimizeCMAES({
+    initialConfig,
+    objectiveFunction,
+    shouldStop: () => !optimizingRange2,
+    onImprovement: async () => {
       drawMechanism();
       await wait();
-    }
-    topz = topz.sort((a, b) => b[0] - a[0])
-    z = topz[0][1]
-  }
-  pushconfig(z);
+    },
+    initialStepSize: 0.1,
+    populationMultiplier: 25,
+    improvementCheckInterval: 15,
+  });
+
+  pushconfig(bestConfig);
   drawMechanism();
 }
 let optimizingRange = false;
@@ -1231,84 +1217,73 @@ async function gentlify() {
   }
   document.getElementById("gentlify").innerText = "Stop";
   gentlifying = true;
-  //wait();
-  var step = .6;
-  var timer = 0;
+
+  // Extract optimizable parameters from particles
   function pullconfig() {
-	  var config = []
+    var config = []
     for (var p of window.data.particles.slice(1)) {
-        if (p.x % 10 != 0) {
-          config.push(p.x)
-        }
-        if (p.y % 10 != 0) {
-	  config.push(p.y)
-        }
-          if (p.mass % 1 != 0) {
-		  config.push(p.mass)
-          }
+      if (p.x % 10 != 0) {
+        config.push(p.x)
+      }
+      if (p.y % 10 != 0) {
+        config.push(p.y)
+      }
+      if (p.mass % 1 != 0) {
+        config.push(p.mass)
+      }
     }
     return config
   }
+
+  // Apply parameters back to particles
   function pushconfig(config) {
-	  var i = 0;
+    var i = 0;
     for (var p of window.data.particles.slice(1)) {
-        if (p.x % 10 != 0) {
-	  p.x = config[i]
-	  i += 1;
-        }
-        if (p.y % 10 != 0) {
-		p.y = config[i]
-		i += 1
-        }
-
-          if (p.mass % 1 != 0) {
-		  p.mass = Math.abs(config[i])
-		  i += 1
-          }
+      if (p.x % 10 != 0) {
+        p.x = config[i]
+        i += 1;
+      }
+      if (p.y % 10 != 0) {
+        p.y = config[i]
+        i += 1
+      }
+      if (p.mass % 1 != 0) {
+        p.mass = Math.abs(config[i])
+        i += 1
+      }
     }
-    return config
   }
-  var z = pullconfig()
-  function q(config) {
-	  pushconfig(config)
-          var [_, range, _, load] = simulateAndRange();
-    if ( range < oldrange) {
-      return -9999999999999999.
+
+  const initialConfig = pullconfig();
+  const minRange = +document.getElementById("range").innerText;
+
+  // Objective function: minimize load while maintaining range
+  const objectiveFunction = (config) => {
+    pushconfig(config);
+    var [_, range, _, load] = simulateAndRange();
+    // Penalize if range drops below minimum
+    if (range < minRange) {
+      return -9999999999999999;
     }
-	  return -load
-  }
-  var topz = []
-  var newz;
+    // Otherwise, maximize negative load (i.e., minimize load)
+    return -load;
+  };
 
-  var population_size = 25 * z.length
-  var oldrange = +document.getElementById("range").innerText;
-  while (gentlifying) {
-
-
-    if (timer > population_size) {
-      topz = topz.slice(0, population_size)
-      var population = topz.map((pair) => pair[1])
-
-      var mean = calculateMean(population)
-      var covariance = calculateCovariance(population, mean)
-      //console.log(covariance)
-      var L = choleskyDecomposition(covariance)
-      newz = sampleGaussian(z, L)
-      //optimizingRange2 = false
-    } else {
-      newz = z.map((el) => el + randn() * step)
-    }
-    var zscore = q(newz)
-    timer += 1
-    topz.push([zscore, newz])
-    if (zscore > topz[0][0]) {
-      
+  // Run optimization
+  const bestConfig = await optimizeCMAES({
+    initialConfig,
+    objectiveFunction,
+    shouldStop: () => !gentlifying,
+    onImprovement: async () => {
       drawMechanism();
       await wait();
-    }
-    topz = topz.sort((a, b) => b[0] - a[0])
-    z = topz[0][1]
-  }
+    },
+    initialStepSize: 0.6,
+    populationMultiplier: 25,
+    improvementCheckInterval: 1,
+  });
+
+  pushconfig(bestConfig);
   drawMechanism();
 }
 let optimizing = false;
