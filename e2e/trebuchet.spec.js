@@ -32,7 +32,7 @@ test.describe('Trebuchet Designer', () => {
     // Check constraint controls
     await expect(page.getByRole('button', { name: '+ Rod' })).toBeVisible();
     await expect(page.getByRole('button', { name: '+ Slider' })).toBeVisible();
-    await expect(page.getByRole('button', { name: '+ Colinear' })).toBeVisible();
+    await expect(page.getByRole('button', { name: '+ Roller' })).toBeVisible();
     await expect(page.getByRole('button', { name: '+ Rope' })).toBeVisible();
     await expect(page.getByRole('button', { name: '+ Pin' })).toBeVisible();
   });
@@ -161,6 +161,6 @@ test.describe('Trebuchet Designer', () => {
 
     // Verify that gentlify maintained range and reduced peak load
     expect(finalRange).toBeGreaterThanOrEqual(initialRange - 10); // Allow small variance
-    expect(finalPeakLoad).toBeLessThanOrEqual(700); // Peak load should be reduced (relaxed for refactored optimizer)
+    expect(finalPeakLoad).toBeLessThanOrEqual(450); // Peak load should be reduced significantly
   });
 });
