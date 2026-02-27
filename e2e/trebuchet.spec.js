@@ -58,7 +58,15 @@ test.describe('Trebuchet Designer', () => {
 
     // Wait for the default preset to load and simulation to complete
     // The application loads the "Hinged Counterweight" preset by default
-    await page.waitForTimeout(1000);
+    // Wait for the range element to have a meaningful value (> 100)
+    await expect(async () => {
+      const rangeText = await page.locator('#range').textContent();
+      const rangeValue = parseFloat(rangeText);
+      expect(rangeValue).toBeGreaterThan(100);
+    }).toPass({ timeout: 5000 });
+
+    // Give a small buffer for values to stabilize
+    await page.waitForTimeout(200);
 
     // Extract the range value
     const rangeText = await page.locator('#range').textContent();

@@ -8,7 +8,7 @@ export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
+  retries: 0, // No retries - tests must pass consistently
   workers: process.env.CI ? 1 : undefined,
   reporter: 'html',
 
@@ -23,7 +23,14 @@ export default defineConfig({
       use: {
         ...devices['Desktop Chrome'],
         launchOptions: {
-          args: [
+          args: process.env.CI ? [
+            // CI environment - minimal flags to avoid crashes
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+            '--disable-gpu',
+          ] : [
+            // Local environment - include all flags
             '--no-sandbox',
             '--disable-setuid-sandbox',
             '--disable-dev-shm-usage',
